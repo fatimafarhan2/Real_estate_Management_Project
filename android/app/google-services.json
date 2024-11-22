@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "999094470425",
+    "project_id": "chatapp-44ddf",
+    "storage_bucket": "chatapp-44ddf.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:999094470425:android:6be3bc96412e847d1ea788",
+        "android_client_info": {
+          "package_name": "com.example.real_estate_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCNTJBUWX4ayBf9QGTnv5OQRgpP4YdYCbA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
