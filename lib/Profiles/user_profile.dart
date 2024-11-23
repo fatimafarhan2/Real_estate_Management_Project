@@ -1,4 +1,3 @@
-
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:real_estate_app/Chat/pages/agentlist.dart';
@@ -11,7 +10,6 @@ import 'package:real_estate_app/UI/textstyle.dart';
 import 'package:real_estate_app/login_and_signup/Firebase/Authserviceuser.dart';
 import 'package:real_estate_app/login_and_signup/authServices.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-
 
 class UserProfile extends StatefulWidget {
   final String role;
@@ -32,19 +30,16 @@ class _UserProfileState extends State<UserProfile> {
   String profilePic = '';
   final SupabaseClient client = Supabase.instance.client;
 
- 
   List<Map<String, dynamic>> properties = [];
-    
 
   List<Map<String, dynamic>> agentinfo = [];
 
   List<Map<String, dynamic>> userinfo = [];
 
-
-   final ScrollController _scrollController = ScrollController();
+  final ScrollController _scrollController = ScrollController();
   bool _showBottomBar = false;
 
-String useridfirebase = '';
+  String useridfirebase = '';
   Future<void> getCurrentUserId() async {
     var user1 = FirebaseAuth.instance.currentUser; // Get the current user
 
@@ -71,17 +66,15 @@ String useridfirebase = '';
     auth.signOut();
   }
 
-
-
   @override
   void initState() {
     super.initState();
     fetchUserInfo();
     print("profile picture url: ${profilePic}");
-    fetchAgentProperties();
+    fetchUserProperties();
     fetchAgentInfo();
-getCurrentUserId();
-      // Listen to scroll events
+    getCurrentUserId();
+    // Listen to scroll events
     _scrollController.addListener(_scrollListener); // changes
     // Fetch properties on initialization
   }
@@ -91,73 +84,68 @@ getCurrentUserId();
 // Try correcting the name to the name of an existing getter, or defining a getter or field named 'data'.
 // data
 // ^^^^
-@override
+  @override
   void dispose() {
     _scrollController.dispose();
     super.dispose();
   }
 
-void _scrollListener() {
-  if (_scrollController.position.atEdge) {
-    final isBottom = _scrollController.position.pixels > 0;
-    setState(() {
-      _showBottomBar = isBottom; // _showBottomBar is set to true if at the bottom edge
-    });
-  } else {
-    setState(() {
-      _showBottomBar = false; // Otherwise, it is set to false
-    });
+  void _scrollListener() {
+    if (_scrollController.position.atEdge) {
+      final isBottom = _scrollController.position.pixels > 0;
+      setState(() {
+        _showBottomBar =
+            isBottom; // _showBottomBar is set to true if at the bottom edge
+      });
+    } else {
+      setState(() {
+        _showBottomBar = false; // Otherwise, it is set to false
+      });
+    }
   }
-}
-
-
-
 
 //pop for deleting account
-Future<void> _deleteAccount(BuildContext context, bool entity) async { //bool entity true of to be deleted is a property else false if an acocount
-  TextEditingController inputController = TextEditingController();
-  TextEditingController ratingController = TextEditingController();
+  Future<void> _deleteAccount(BuildContext context, bool entity) async {
+    //bool entity true of to be deleted is a property else false if an acocount
+    TextEditingController inputController = TextEditingController();
+    TextEditingController ratingController = TextEditingController();
 
-  await showDialog(
-    context: context,
-    builder: (context) => AlertDialog(
-      title: const Text('Are you sure you wish to delete ?'),
-      content: const SizedBox(height: 10.0),
-      actions: [
-        TextButton(
-          onPressed: () {
-            // Action for 'Yes' button
-            //add query here 
-            //if bool is yes add query for property else for 
-            //for deletion of account
-            Navigator.of(context).pop(); // Close the dialog
-          },
-          child: const Text('Yes'),
-        ),
-        TextButton(
-          onPressed: () {
-            // Action for 'No' button
-            Navigator.of(context).pop(); // Close the dialog
-          },
-          child: const Text('No'),
-        ),
-      ],
-    ),
-  );
-}
-
-
-
-
+    await showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Are you sure you wish to delete ?'),
+        content: const SizedBox(height: 10.0),
+        actions: [
+          TextButton(
+            onPressed: () {
+              // Action for 'Yes' button
+              //add query here
+              //if bool is yes add query for property else for
+              //for deletion of account
+              Navigator.of(context).pop(); // Close the dialog
+            },
+            child: const Text('Yes'),
+          ),
+          TextButton(
+            onPressed: () {
+              // Action for 'No' button
+              Navigator.of(context).pop(); // Close the dialog
+            },
+            child: const Text('No'),
+          ),
+        ],
+      ),
+    );
+  }
 
 //fetching all agents hired by user
+
+// ----------------------------------///change joined table-> agent extract.
   Future<void> fetchAgentInfo() async {
     try {
-      final data = await client.from('agent').select('''
-          username,
-          phone_number,
-          email
-        ''').eq('client_id', widget.userid);
+      final data = await client.rpc('get_agent_for_client', params: {
+        'p_client_id': widget.userid, // Pass client ID as a parameter
+      });
 
       if (data == null || data.isEmpty) {
         print('No properties found for this agent.');
@@ -200,7 +188,7 @@ Future<void> _deleteAccount(BuildContext context, bool entity) async { //bool en
   }
 
 //fetching the properties associated with users
-  Future<void> fetchAgentProperties() async {
+  Future<void> fetchUserProperties() async {
     try {
       final data = await client.from('properties').select('''
           title,
@@ -222,48 +210,50 @@ Future<void> _deleteAccount(BuildContext context, bool entity) async { //bool en
     } catch (e) {
       print('Error fetching agent properties: $e');
     }
-  }bool _isHovering = true;
+  }
+
+  bool _isHovering = true;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-          leading: IconButton(
-            color: scaffoldColor,
-            icon: const Icon(Icons.logout), // Logout icon
-            onPressed: () {
-              Supabaselogout();
-              firebaselogout();
-            },
-          ),
-          title: const Text(
-            'User Profile',
-            style: tappbar_style,
-          ),
-          actions: [
-            if (widget.role != 'admin')
-              ElevatedButton.icon(
-                onPressed: () {
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => ViewWishlist(
-                                userid: widget.userid,
-                              )));
-                },
-                label: const Text(
-                  'View WishList',
-                  style: TextStyle(fontSize: 17, fontWeight: FontWeight.w600),
-                ),
-                icon: const Icon(Icons.star),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: drawerBoxColorTwo,
-                  foregroundColor: buttonColor,
-                ),
-              )
-          ],
+        leading: IconButton(
+          color: scaffoldColor,
+          icon: const Icon(Icons.logout), // Logout icon
+          onPressed: () {
+            Supabaselogout();
+            firebaselogout();
+          },
         ),
+        title: const Text(
+          'User Profile',
+          style: tappbar_style,
+        ),
+        actions: [
+          if (widget.role != 'admin')
+            ElevatedButton.icon(
+              onPressed: () {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => ViewWishlist(
+                              userid: widget.userid,
+                            )));
+              },
+              label: const Text(
+                'View WishList',
+                style: TextStyle(fontSize: 17, fontWeight: FontWeight.w600),
+              ),
+              icon: const Icon(Icons.star),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: drawerBoxColorTwo,
+                foregroundColor: buttonColor,
+              ),
+            )
+        ],
+      ),
       body: SingleChildScrollView(
-        controller: _scrollController, 
+        controller: _scrollController,
         scrollDirection: Axis.vertical,
         child: Column(
           children: [
@@ -276,28 +266,31 @@ Future<void> _deleteAccount(BuildContext context, bool entity) async { //bool en
                   Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: ClipOval(
-                        child: profilePic =='No profile picture'
-                        ? Image.asset('images/default_profile.jpg',
-                        width: 150,
-                        height: 200, 
-                        )
-                        : Image.network(
-                            profilePic,
-                            width: 190.0,
-                            height: 200.0,
-                            fit: BoxFit.cover,
-                            loadingBuilder: (context, child, loadingProgress) {
-                              if (loadingProgress == null) return child;
-                              return Center(
-                                child: CircularProgressIndicator(
-                                  value: loadingProgress.expectedTotalBytes != null
-                                      ? loadingProgress.cumulativeBytesLoaded /
-                                          (loadingProgress.expectedTotalBytes ?? 1)
-                                      : null,
-                                ),
-                              );
-                                 })
-                      ),
+                        child: profilePic == 'No profile picture'
+                            ? Image.asset(
+                                'images/default_profile.jpg',
+                                width: 150,
+                                height: 200,
+                              )
+                            : Image.network(profilePic,
+                                width: 190.0,
+                                height: 200.0,
+                                fit: BoxFit.cover, loadingBuilder:
+                                    (context, child, loadingProgress) {
+                                if (loadingProgress == null) return child;
+                                return Center(
+                                  child: CircularProgressIndicator(
+                                    value: loadingProgress.expectedTotalBytes !=
+                                            null
+                                        ? loadingProgress
+                                                .cumulativeBytesLoaded /
+                                            (loadingProgress
+                                                    .expectedTotalBytes ??
+                                                1)
+                                        : null,
+                                  ),
+                                );
+                              })),
                   ),
                   // User Information Section
                   Padding(
@@ -306,89 +299,93 @@ Future<void> _deleteAccount(BuildContext context, bool entity) async { //bool en
                       width: 400,
                       height: 200,
                       decoration: BoxDecoration(
-                           boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withOpacity(0.2), // Shadow color
-                              blurRadius: 15, // Softness of the shadow
-                              spreadRadius: 0.8, // Extend the shadow
-                              offset: const Offset(10, 10), // Position of the shadow
-                            ),],
+                        boxShadow: [
+                          BoxShadow(
+                            color:
+                                Colors.black.withOpacity(0.2), // Shadow color
+                            blurRadius: 15, // Softness of the shadow
+                            spreadRadius: 0.8, // Extend the shadow
+                            offset:
+                                const Offset(10, 10), // Position of the shadow
+                          ),
+                        ],
                         borderRadius: BorderRadius.circular(15.0),
                         color: drawerBoxColorTwo,
-                      
                       ),
-                      child: LayoutBuilder(
-                        builder: (BuildContext context, BoxConstraints constraints){
-                          double maxwidth = constraints.maxWidth;                            
+                      child: LayoutBuilder(builder:
+                          (BuildContext context, BoxConstraints constraints) {
+                        double maxwidth = constraints.maxWidth;
                         return Padding(
                           padding: const EdgeInsets.all(10),
                           child: maxwidth > 600
-                          ?Row(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Expanded(
-                                child: Column(
+                              ? Row(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    const SizedBox(height: 6.0),
-                                    const Text(
-                                      'User Information',
-                                      style: tUserTitle,
+                                    Expanded(
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          const SizedBox(height: 6.0),
+                                          const Text(
+                                            'User Information',
+                                            style: tUserTitle,
+                                          ),
+                                          Text(
+                                            'User Name: $username',
+                                            style: tUserBody,
+                                          ),
+                                        ],
+                                      ),
                                     ),
-                                    Text(
-                                      'User Name: $username',
-                                      style: tUserBody,
+                                    Expanded(
+                                      // Start Expanded (Right Column)
+                                      child: Column(
+                                        // Start Right Column
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text('Phone Number: $phoneNumber',
+                                              style: tUserBody),
+                                          Text('Email: $email',
+                                              style: tUserBody),
+                                        ],
+                                      ), // End Right Column
                                     ),
                                   ],
-                                ),
-                              ),
-                       Expanded( // Start Expanded (Right Column)
-                        child: Column( // Start Right Column
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text('Phone Number: $phoneNumber', style: tUserBody),
-                            Text('Email: $email', style: tUserBody),
-                          ],
-                        ), // End Right Column
-                      ), 
-                            ],
-                          )
-                        : SingleChildScrollView(
-                          scrollDirection: Axis.vertical,
-                          child: SingleChildScrollView(
-                            scrollDirection: Axis.horizontal,
-                            child: Column( // Start Column for narrow layout
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  const Text(
-                                    'User Information',
-                                    style: tUserTitle,
+                                )
+                              : SingleChildScrollView(
+                                  scrollDirection: Axis.vertical,
+                                  child: SingleChildScrollView(
+                                    scrollDirection: Axis.horizontal,
+                                    child: Column(
+                                      // Start Column for narrow layout
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        const Text(
+                                          'User Information',
+                                          style: tUserTitle,
+                                        ),
+                                        Text('User Name: $username',
+                                            style: tUserBody),
+                                        Text('Phone Number: $phoneNumber',
+                                            style: tUserBody),
+                                        Text('Email: $email', style: tUserBody),
+                                      ],
+                                    ),
                                   ),
-                                  Text('User Name: $username', style: tUserBody),
-                                  Text('Phone Number: $phoneNumber', style: tUserBody),
-                                  Text('Email: $email', style: tUserBody),
-                                ],
-                              ),
-                          ),
-                        ), 
+                                ),
                         );
-                        }
-                      ),
+                      }),
                     ),
                   ),
                   // User Profile Picture Section
-                    
-                    
-                    
-                  
-              
-                    
-                        
                 ],
               ),
             ),
-        
-        // Display Agent Information
+
+            // Display Agent Information
             Container(
               padding: const EdgeInsets.all(10.0), // Add vertical padding
               alignment: Alignment.topLeft, // Center the text
@@ -407,16 +404,16 @@ Future<void> _deleteAccount(BuildContext context, bool entity) async { //bool en
               height: 200,
               width: 390,
               decoration: BoxDecoration(
-                 boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withOpacity(0.2), // Shadow color
-                              blurRadius: 15, // Softness of the shadow
-                              spreadRadius: 0.8, // Extend the shadow
-                              offset: const Offset(10, 10), // Position of the shadow
-                            ),],
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.2), // Shadow color
+                    blurRadius: 15, // Softness of the shadow
+                    spreadRadius: 0.8, // Extend the shadow
+                    offset: const Offset(10, 10), // Position of the shadow
+                  ),
+                ],
                 color: drawerBoxColorTwo,
                 borderRadius: BorderRadius.circular(20.0),
-                
               ),
               child: SingleChildScrollView(
                 child: Padding(
@@ -480,7 +477,7 @@ Future<void> _deleteAccount(BuildContext context, bool entity) async { //bool en
                 ),
               ),
             ),
-        //displaying Appointment
+            //displaying Appointment
             Container(
               padding: const EdgeInsets.all(10.0), // Add vertical padding
               alignment: Alignment.topLeft, // Center the text
@@ -499,16 +496,16 @@ Future<void> _deleteAccount(BuildContext context, bool entity) async { //bool en
               height: 200,
               width: 390,
               decoration: BoxDecoration(
-                color:drawerBoxColorTwo,
-                 boxShadow: [
+                color: drawerBoxColorTwo,
+                boxShadow: [
                   BoxShadow(
                     color: Colors.black.withOpacity(0.2), // Shadow color
                     blurRadius: 15, // Softness of the shadow
                     spreadRadius: 0.8, // Extend the shadow
                     offset: const Offset(10, 10), // Position of the shadow
-                  ),],
+                  ),
+                ],
                 borderRadius: BorderRadius.circular(20.0),
-              
               ),
               child: SingleChildScrollView(
                   child: Padding(
@@ -531,8 +528,8 @@ Future<void> _deleteAccount(BuildContext context, bool entity) async { //bool en
             const SizedBox(
               height: 10,
             ),
-        // Display properties with ListView.builder
-        Container(
+            // Display properties with ListView.builder
+            Container(
               padding: const EdgeInsets.all(10.0), // Add vertical padding
               alignment: Alignment.topLeft, // Center the text
               child: const Text(
@@ -550,13 +547,14 @@ Future<void> _deleteAccount(BuildContext context, bool entity) async { //bool en
               child: Container(
                 decoration: BoxDecoration(
                   color: drawerBoxColorTwo,
-                   boxShadow: [
+                  boxShadow: [
                     BoxShadow(
                       color: Colors.black.withOpacity(0.2), // Shadow color
                       blurRadius: 15, // Softness of the shadow
                       spreadRadius: 0.8, // Extend the shadow
                       offset: const Offset(10, 10), // Position of the shadow
-                    ),],
+                    ),
+                  ],
                   borderRadius: BorderRadius.circular(20.0),
                 ),
                 height: 300,
@@ -602,13 +600,11 @@ Future<void> _deleteAccount(BuildContext context, bool entity) async { //bool en
                                 ),
                               ],
                             ),
-
-                            IconButton(onPressed: ()=> _deleteAccount(context, true)
-                            , icon:const Icon(Icons.delete),
-                            color: Colors.white,
-
+                            IconButton(
+                              onPressed: () => _deleteAccount(context, true),
+                              icon: const Icon(Icons.delete),
+                              color: Colors.white,
                             )
-
                           ],
                         ),
                       ),
@@ -617,7 +613,7 @@ Future<void> _deleteAccount(BuildContext context, bool entity) async { //bool en
                 ),
               ),
             ),
-        
+
             const SizedBox(
               height: 53,
             ),
@@ -626,13 +622,13 @@ Future<void> _deleteAccount(BuildContext context, bool entity) async { //bool en
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
                   ElevatedButton.icon(
-                    onPressed: (){
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => AgentListPage()),
-                        );
-                      },
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => AgentListPage()),
+                      );
+                    },
                     icon: const Icon(Icons.person),
                     label: const Text(
                       'View Agents',
@@ -663,13 +659,13 @@ Future<void> _deleteAccount(BuildContext context, bool entity) async { //bool en
                   ),
                   ElevatedButton.icon(
                     onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) =>
-                                  UserChatLogPage(userId: useridfirebase)),
-                        );
-                      },
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) =>
+                                UserChatLogPage(userId: useridfirebase)),
+                      );
+                    },
                     icon: const Icon(Icons.chat),
                     label: const Text(
                       'View Chat',
@@ -688,34 +684,26 @@ Future<void> _deleteAccount(BuildContext context, bool entity) async { //bool en
                 ],
               ),
             const SizedBox(height: 15),
-            
-
-       
-
-
-
           ],
         ),
       ),
-     bottomNavigationBar: _showBottomBar
-    ? BottomAppBar(
-        color: const Color.fromARGB(255, 63, 13, 9),
-        height: 60,
-        child: Row(
-          children: [
-            TextButton(
-              onPressed: () => _deleteAccount(context,false),
-              child: const Text(
-                'DELETE ACCOUNT',
-                style: tappbar_style,
+      bottomNavigationBar: _showBottomBar
+          ? BottomAppBar(
+              color: const Color.fromARGB(255, 63, 13, 9),
+              height: 60,
+              child: Row(
+                children: [
+                  TextButton(
+                    onPressed: () => _deleteAccount(context, false),
+                    child: const Text(
+                      'DELETE ACCOUNT',
+                      style: tappbar_style,
+                    ),
+                  ),
+                ],
               ),
-            ),
-          ],
-        ),
-      )
-    : null,
-
+            )
+          : null,
     );
-
   }
 }

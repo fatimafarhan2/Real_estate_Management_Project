@@ -199,6 +199,8 @@ class _ViewAgentState extends State<ViewAgent> {
         title: const Text('Agent View', style: tappbar_style),
         actions: [
           ElevatedButton.icon(
+            //i will fetch the agent and store its id ,getter for fetching this particular agent id
+            //this class object will return the id of agent to the property form page
             onPressed: () {},
             label: const Text('Hire This Agent'),
             icon: const Icon(Icons.person),

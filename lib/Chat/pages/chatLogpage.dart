@@ -41,7 +41,7 @@ class UserChatLogPage extends StatelessWidget {
           }
 
           final chats = snapshot.data!.docs;
-          print(chats);
+          print('chats :$chats');
           // Handle case where there are no chats
           if (chats.isEmpty) {
             return const Center(child: Text("No chats found."));
