@@ -23,3 +23,5 @@ const Color borderColor = Color.fromARGB(255, 7, 54, 9);
 const Color propertyBoxColor = Color.fromARGB(255, 2, 41, 19);
 
 const Color drawerBoxColor = Color.fromARGB(255, 166, 175, 81);
+
+const Color drawerBoxColorTwo = Color.fromARGB(255, 174, 189, 33);

@@ -31,7 +31,7 @@ class _SignupPageAgentState extends State<SignupPageAgent> {
   final TextEditingController priceController = TextEditingController();
 
   final TextEditingController usernameController = TextEditingController();
-
+  String? fPath;
   //authservice firebase
   final authfireservice = AuthServicesUser();
 
@@ -162,17 +162,17 @@ class _SignupPageAgentState extends State<SignupPageAgent> {
                     onPressed: () async {
                       // Placeholder for signup action
                       bool result = await authServices.signUpUserAgent(
-                        'agent',
-                        addressController.text,
-                        firstNameController.text,
-                        usernameController.text,
-                        lastNameController.text,
-                        phoneNumberController.text,
-                        emailController.text,
-                        hashPassword(passwordController.text),
-                        double.parse(priceController.text),
-                        context,
-                      );
+                          'agent',
+                          addressController.text, 
+                          firstNameController.text, 
+                          lastNameController.text, 
+                          phoneNumberController.text, 
+                          emailController.text, 
+                          hashPassword(passwordController.text), 
+                          double.parse(priceController.text),
+                          fPath,
+                          usernameController.text,
+                          context);
                       // Firebase signup
                       await authfireservice.authenticateUser(
                         email: emailController.text,
