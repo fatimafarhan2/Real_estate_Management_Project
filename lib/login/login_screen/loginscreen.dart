@@ -92,16 +92,19 @@ class LoginInput extends StatelessWidget {
                     int result = await authServices.loginUser(
                         context,
                         emailController.text,
-                        hashPassword(
+                       role != 'admin'
+                       ?hashPassword(
                           passwordController.text,
-                        ),
+                        )
+                        :passwordController.text,                        
                         role);
-                    //firebase login
-                    await authfireservice.authenticateUser(
+                        
+                    if(role!= 'admin')//firebase login
+                    {await authfireservice.authenticateUser(
                         email: emailController.text,
                         password: passwordController.text,
                         isLogin: true,
-                        role: role);
+                        role: role);}
 
                     if (result == 1) //case no user exist as such
                     {
