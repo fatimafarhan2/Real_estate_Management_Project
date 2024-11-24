@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:real_estate_app/Profiles/sub_pages/viewAgent.dart';
 import 'package:real_estate_app/UI/color.dart';
 import 'package:real_estate_app/UI/textstyle.dart';
 import 'package:real_estate_app/Property/subpages/functions.dart';
@@ -480,6 +481,13 @@ class _PropertyviewState extends State<Propertyview> {
                     ),
                   ],
                 ),
+
+              ElevatedButton(
+                  onPressed: () {},
+                  child: Text(
+                    'Offer',
+                    style: tUserTitle,
+                  ))
             ],
           ),
         ),

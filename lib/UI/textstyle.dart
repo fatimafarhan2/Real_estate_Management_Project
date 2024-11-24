@@ -75,6 +75,6 @@ const tDrawerButton = TextStyle(
     fontSize: 18,
     fontWeight: FontWeight.bold,
     fontStyle: FontStyle.normal,
-    color: buttonColor);
+    color: Color.fromARGB(255, 221, 226, 219));
 
 const Tleading_header = TextStyle(fontSize: 16, fontWeight: FontWeight.w700);

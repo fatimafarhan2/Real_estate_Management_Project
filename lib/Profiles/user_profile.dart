@@ -7,6 +7,7 @@ import 'package:real_estate_app/Profiles/sub_pages/viewAgent.dart';
 import 'package:real_estate_app/Profiles/sub_pages/viewWishlists.dart';
 import 'package:real_estate_app/UI/color.dart';
 import 'package:real_estate_app/UI/textstyle.dart';
+import 'package:real_estate_app/forms/property_details_form.dart';
 import 'package:real_estate_app/login_and_signup/Firebase/Authserviceuser.dart';
 import 'package:real_estate_app/login_and_signup/authServices.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -529,19 +530,51 @@ class _UserProfileState extends State<UserProfile> {
               height: 10,
             ),
             // Display properties with ListView.builder
-            Container(
-              padding: const EdgeInsets.all(10.0), // Add vertical padding
-              alignment: Alignment.topLeft, // Center the text
-              child: const Text(
-                ' Properties',
-                style: TextStyle(
-                  fontSize: 33,
-                  fontStyle: FontStyle.normal,
-                  fontWeight: FontWeight.w700,
-                  color: buttonColor,
+
+            // -----------------------------------------------------------Changed and added button-----------------------------------
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(10.0), // Add vertical padding
+                  alignment: Alignment.topLeft, // Center the text
+                  child: const Text(
+                    ' Properties',
+                    style: TextStyle(
+                      fontSize: 33,
+                      fontStyle: FontStyle.normal,
+                      fontWeight: FontWeight.w700,
+                      color: buttonColor,
+                    ),
+                  ),
                 ),
-              ),
+                // SizedBox(
+                //   width: 90,
+                // ),
+                Container(
+                  decoration: const BoxDecoration(
+                    color: buttonColor, // Background color
+                    shape: BoxShape.circle, // Makes the background circular
+                  ),
+                  child: IconButton(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => PropertyDetails()
+
+                            // for refresh
+
+                            ),
+                      );
+                    },
+                    icon: Icon(Icons.add),
+                    color: scaffoldColor,
+                  ),
+                )
+              ],
             ),
+            // -----------------------------------------------------------Changed and added button-----------------------------------
             Padding(
               padding: const EdgeInsets.all(12.0),
               child: Container(

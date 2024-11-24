@@ -13,6 +13,7 @@ import 'package:real_estate_app/Property/subpages/viewComments.dart';
 import 'package:real_estate_app/Signup/Signup.dart';
 import 'package:real_estate_app/forms/offers_form.dart';
 import 'package:real_estate_app/forms/property_details_form.dart';
+import 'package:real_estate_app/login/login.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 //import 'package:real_estate_app/Profiles/user_profile.dart';
 //import 'Profiles/agent_profile.dart';

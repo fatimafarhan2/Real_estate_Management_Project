@@ -10,6 +10,7 @@ import 'package:crypto/crypto.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 import 'package:supabase_flutter/supabase_flutter.dart';
+
 class SignupPageUser extends StatefulWidget {
   const SignupPageUser({super.key});
 
@@ -39,10 +40,9 @@ class _SignupPageUserState extends State<SignupPageUser> {
 // authservice supabase
   final authServices = Authservices();
 
-
-    final storage = Supabase.instance.client.storage;
-   String? fPath;
-final SupabaseClient client = Supabase.instance.client;
+  final storage = Supabase.instance.client.storage;
+  String? fPath;
+  final SupabaseClient client = Supabase.instance.client;
 
 //extractin url of user's upload image
   Future<String?> fetchImageUrl(String filePath) async {
@@ -57,59 +57,52 @@ final SupabaseClient client = Supabase.instance.client;
     }
   }
 
-
-
-File? _imageFile;
+  File? _imageFile;
 //Pick image method
-Future pickImage() async{
-  final ImagePicker picker = ImagePicker();
+  Future pickImage() async {
+    final ImagePicker picker = ImagePicker();
 
-  //Pick from gallery
-     XFile? image = await picker.pickImage(source: ImageSource.gallery);
+    //Pick from gallery
+    XFile? image = await picker.pickImage(source: ImageSource.gallery);
     setState(() {
-  if(image!=null){
-    _imageFile = File(image.path);
+      if (image != null) {
+        _imageFile = File(image.path);
+      }
+    });
   }
-});
-}
 
 //upload method
 // Upload method
-Future<String?> uploadImage() async {
-  if (_imageFile == null) return null;
+  Future<String?> uploadImage() async {
+    if (_imageFile == null) return null;
 
-  final fileName = DateTime.now().millisecondsSinceEpoch.toString(); // Unique file name
-  final path = 'uploads/$fileName'; // Path in the bucket
+    final fileName =
+        DateTime.now().millisecondsSinceEpoch.toString(); // Unique file name
+    final path = 'uploads/$fileName'; // Path in the bucket
 
-  try {
-    // Upload the file to Supabase storage
-    await Supabase.instance.client.storage
-        .from('ProfilePictures') // Bucket name
-        .upload(path, _imageFile!);
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Image uploaded successfully')),
-    );
-    // Returning the file path 
-       final url = await storage
-          .from('ProfilePicture')
-          .getPublicUrl(path);
+    try {
+      // Upload the file to Supabase storage
+      await Supabase.instance.client.storage
+          .from('ProfilePictures') // Bucket name
+          .upload(path, _imageFile!);
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Image uploaded successfully')),
+      );
+      // Returning the file path
+      final url = await storage.from('ProfilePicture').getPublicUrl(path);
 
-     setState(() {
-       fPath = url.toString();
+      setState(() {
+        fPath = url.toString();
       });
-   return fPath;
-  } catch (e) {
-    
-    debugPrint('Error uploading image: $e');
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Failed to upload image')),
-    );
-    return null;
+      return fPath;
+    } catch (e) {
+      debugPrint('Error uploading image: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Failed to upload image')),
+      );
+      return null;
+    }
   }
-}
-
- 
-
 
 //hash function for pawword
   String hashPassword(String password) {
@@ -168,22 +161,25 @@ Future<String?> uploadImage() async {
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 20),
-                
 
                 Center(
                   child: ElevatedButton.icon(
                     onPressed: () async {
                       await pickImage(); // Open image picker
-                        //extracting image url:modified
+                      //extracting image url:modified
                       await uploadImage(); // Upload the image to Supabase
                       print(fPath);
                     },
                     icon: const Icon(Icons.upload),
-                    label: const Text('Upload Image', style: tbutton_style,),
+                    label: const Text(
+                      'Upload Image',
+                      style: tbutton_style,
+                    ),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor:buttonColor,
+                      backgroundColor: buttonColor,
                       foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 20, vertical: 10),
                     ),
                   ),
                 ),
@@ -256,12 +252,12 @@ Future<String?> uploadImage() async {
                       //supabase signup
                       bool result = await authServices.signUpUserAgent(
                           'user',
-                          addressController.text, 
-                          firstNameController.text, 
-                          lastNameController.text, 
-                          phoneNumberController.text, 
-                          emailController.text, 
-                          hashPassword(passwordController.text), 
+                          addressController.text,
+                          firstNameController.text,
+                          lastNameController.text,
+                          phoneNumberController.text,
+                          emailController.text,
+                          hashPassword(passwordController.text),
                           0,
                           fPath,
                           usernameController.text,

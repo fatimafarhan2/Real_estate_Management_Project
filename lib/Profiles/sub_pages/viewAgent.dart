@@ -5,6 +5,7 @@ import 'package:real_estate_app/Chat/pages/chatpage.dart';
 import 'package:real_estate_app/Property/subpages/functions.dart';
 import 'package:real_estate_app/UI/color.dart';
 import 'package:real_estate_app/UI/textstyle.dart';
+import 'package:real_estate_app/forms/Globalvariable.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 double rating = 2.0;
@@ -33,12 +34,21 @@ class _ViewAgentState extends State<ViewAgent> {
   String phoneNumber = '';
   String email = '';
   String useridfirebase = '';
+
+// Declare a global instance of Globalvariable
+
+  Globalvariable hiredAgent = Globalvariable();
+
   @override
   void initState() {
     super.initState();
     getCurrentUserId();
     fetchAgentProperties();
     fetchAgentInfo(); // Fetch properties on initialization
+  }
+
+  String getteragentid() {
+    return widget.agentid;
   }
 
   Future<void> getCurrentUserId() async {
@@ -201,7 +211,12 @@ class _ViewAgentState extends State<ViewAgent> {
           ElevatedButton.icon(
             //i will fetch the agent and store its id ,getter for fetching this particular agent id
             //this class object will return the id of agent to the property form page
-            onPressed: () {},
+            onPressed: () {
+              hiredAgent.agent_id = widget.agentid;
+              print(
+                  'agent id : ${widget.agentid} Hired agent :${hiredAgent.agent_id}');
+              Navigator.pop(context);
+            },
             label: const Text('Hire This Agent'),
             icon: const Icon(Icons.person),
             style: ElevatedButton.styleFrom(
