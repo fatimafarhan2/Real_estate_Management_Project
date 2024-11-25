@@ -4,6 +4,7 @@ import 'package:real_estate_app/Admin/display_screen/viewagent.dart';
 import 'package:real_estate_app/Chat/pages/agentlist.dart';
 import 'package:real_estate_app/Chat/pages/chatLogpage.dart';
 import 'package:real_estate_app/Homepage/mainpage.dart';
+import 'package:real_estate_app/Profiles/sub_pages/userProfileUpdatedPage.dart';
 import 'package:real_estate_app/Profiles/sub_pages/viewAgent.dart';
 import 'package:real_estate_app/Profiles/sub_pages/viewWishlists.dart';
 import 'package:real_estate_app/UI/color.dart';
@@ -339,9 +340,12 @@ class _UserProfileState extends State<UserProfile> {
                                             'User Name: $username',
                                             style: tUserBody,
                                           ),
+                                          
                                         ],
                                       ),
+                                      
                                     ),
+
                                     Expanded(
                                       // Start Expanded (Right Column)
                                       child: Column(
@@ -352,10 +356,29 @@ class _UserProfileState extends State<UserProfile> {
                                           Text('Phone Number: $phoneNumber',
                                               style: tUserBody),
                                           Text('Email: $email',
-                                              style: tUserBody),
+                                              style: tUserBody),  
+                                  ElevatedButton.icon(
+                                    onPressed: (){
+                              Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) => const UserProfileUpdatePage()
+                                        // for refresh
+                                        ),
+                                  );
+                                    },
+                                    label:const Text( 'Update Profile',style: tbutton_style,),
+                                    icon: const Icon(Icons.update),
+                                    style: ElevatedButton.styleFrom(
+                                      iconColor: Colors.white,
+                                      backgroundColor: buttonColor,
+                                    ),
+
+                                  )                                      
                                         ],
                                       ), // End Right Column
                                     ),
+
                                   ],
                                 )
                               : SingleChildScrollView(
@@ -376,6 +399,23 @@ class _UserProfileState extends State<UserProfile> {
                                         Text('Phone Number: $phoneNumber',
                                             style: tUserBody),
                                         Text('Email: $email', style: tUserBody),
+                                              ElevatedButton.icon(
+                                    onPressed: (){
+                              Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) => const UserProfileUpdatePage()
+                                        // for refresh
+                                        ),
+                                  );
+                                    },
+                                    label:const Text( 'Update Profile',style: tbutton_style,),
+                                  
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: buttonColor,
+                                    ),
+
+                                  )
                                       ],
                                     ),
                                   ),
