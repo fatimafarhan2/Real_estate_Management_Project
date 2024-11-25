@@ -3,6 +3,7 @@ import 'package:real_estate_app/UI/color.dart';
 import 'package:real_estate_app/UI/textstyle.dart';
 import 'package:real_estate_app/login/login_screen/loginscreen.dart';
 
+//done with navigators here
 class Login extends StatelessWidget {
   const Login({super.key});
 
@@ -27,7 +28,7 @@ class Login extends StatelessWidget {
               decoration: const BoxDecoration(
                   shape: BoxShape.circle, color: buttonColor),
               child: IconButton(
-                onPressed: () {},
+                onPressed: () {}, //no functionality just for logo
                 icon: const Icon(
                   Icons.house_outlined,
                   size: 120,
@@ -49,7 +50,7 @@ class Login extends StatelessWidget {
               ),
               role: 'user',
             ),
-            SizedBox(height: 20),
+          const SizedBox(height: 20),
             const LoginButton(
               lStr: Text(
                 'LOGIN AS AGENT',

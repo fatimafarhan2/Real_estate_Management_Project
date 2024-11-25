@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:real_estate_app/Admin/display_screen/viewproperty.dart';
+import 'package:real_estate_app/Property/propertyView.dart';
 import 'package:real_estate_app/UI/color.dart';
 import 'package:real_estate_app/UI/textstyle.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+//done with navigation
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
 
@@ -24,8 +27,10 @@ class _HomePageState extends State<HomePage> {
   double maxprice = 500000000.0;
   double? selsize;
   String? selname;
+  List<int> propertyId = [];
 
   List<Map<String, dynamic>> filteredProperties = [];
+  List<Map<String, dynamic>> profiles = [];
   List<Map<String, dynamic>> allProperties = [];
   List<DropdownMenuItem<String>> allCategories = [];
   List<DropdownMenuItem<String>> allCities = [];
@@ -144,6 +149,12 @@ class _HomePageState extends State<HomePage> {
           filteredProperties = [];
         });
       }
+      //save all property ids in a list 
+      // Extracting the 'property_id' column into an int list
+    propertyId = filteredProperties
+    .map((property) => property['property_id'] as int)
+    .toList();
+
     } catch (e) {
       print('Error filtering properties: $e');
     }
@@ -155,11 +166,24 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+          actions: [
+              ElevatedButton.icon(
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  style: ElevatedButton.styleFrom(
+                        iconColor: const Color.fromARGB(255, 203, 208, 189),
+                        backgroundColor: const Color.fromARGB(255, 2, 41, 19),                  
+                  ),
+                  label: const Text('Profile',style: tbutton_style,),
+                  )
+        ],
         title: const Center(
             child: Text(
           'Real Estate Management',
           style: tappbar_style,
         )),
+      
       ),
       backgroundColor: scaffoldColor,
       drawer: Drawer(
@@ -358,12 +382,19 @@ class _HomePageState extends State<HomePage> {
                                 )),
                           ),
                           ListTile(
+                            onTap: (){
+                                 Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => Propertyview(propertyid: property['property_id'],role: 'user',)),
+                        );
+                            }, //navigator for property view page
                             title: Text(
                               property['title'],
                               style: tAppointmentBody,
                             ),
                             subtitle: Text(
-                              'Category: ${property['category_id']}, \nCity: ${property['city']}',
+                              'Category:  ${property['category_id']} \nCity: ${property['city']}',
                               style: tUserBody,
                             ),
                             trailing: Text(

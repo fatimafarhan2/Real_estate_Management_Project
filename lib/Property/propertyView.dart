@@ -1,9 +1,10 @@
+// ignore: file_names
 import 'package:flutter/material.dart';
-import 'package:real_estate_app/Profiles/sub_pages/viewAgent.dart';
 import 'package:real_estate_app/UI/color.dart';
 import 'package:real_estate_app/UI/textstyle.dart';
 import 'package:real_estate_app/Property/subpages/functions.dart';
 import 'package:real_estate_app/Property/subpages/viewComments.dart';
+import 'package:real_estate_app/forms/offers_form.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 String userComment = '';
@@ -180,6 +181,28 @@ class _PropertyviewState extends State<Propertyview> {
           'Sage Appartments',
           style: tappbar_style,
         ),
+        actions: [          
+              ElevatedButton(
+                  onPressed: () {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => const OfferForm()
+                            // for refresh
+                            ),
+                      );
+                  },
+                  style: ElevatedButton.styleFrom(
+                        iconColor: const Color.fromARGB(255, 203, 208, 189),
+                        backgroundColor: const Color.fromARGB(255, 2, 41, 19),
+                  
+                  ),
+                  child: const Text(
+                    'Create an Offer',
+                    style: TextStyle(
+                              color: Color.fromARGB(255, 203, 208, 189)))
+                  )
+        ],
       ),
       backgroundColor: propertyBGColor,
       body: SingleChildScrollView(
@@ -482,12 +505,8 @@ class _PropertyviewState extends State<Propertyview> {
                   ],
                 ),
 
-              ElevatedButton(
-                  onPressed: () {},
-                  child: Text(
-                    'Offer',
-                    style: tUserTitle,
-                  ))
+                  
+                  
             ],
           ),
         ),

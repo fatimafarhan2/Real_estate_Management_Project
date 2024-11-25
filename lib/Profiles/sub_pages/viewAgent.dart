@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:real_estate_app/Chat/pages/chatpage.dart';
+import 'package:real_estate_app/Profiles/sub_pages/viewAgentReviews.dart';
 import 'package:real_estate_app/Property/subpages/functions.dart';
 import 'package:real_estate_app/UI/color.dart';
 import 'package:real_estate_app/UI/textstyle.dart';
@@ -220,7 +221,7 @@ class _ViewAgentState extends State<ViewAgent> {
             label: const Text('Hire This Agent'),
             icon: const Icon(Icons.person),
             style: ElevatedButton.styleFrom(
-              iconColor: Colors.white,
+              iconColor:buttonColor,
               backgroundColor: drawerBoxColor,
             ),
           )
@@ -245,39 +246,45 @@ class _ViewAgentState extends State<ViewAgent> {
                         width: 5.0,
                       ),
                     ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const SizedBox(height: 6.0),
-                        const Text('  Agent\n  Information ',
-                            style: tUserTitle),
-                        // Text('  Title: $title', style: tUserBody),
-                        Text('  Username: $username', style: tUserBody),
-                        Text('  Phone Number: $phoneNumber', style: tUserBody),
-                        Text('  Email: $email', style: tUserBody),
-                        Text('  Price: $price', style: tUserBody),
-                        if (widget.role != 'admin') ...[
-                          const Text('  Agent Rating:', style: tUserBody),
-                          RatingBar(
-                            initialRating: 4.0,
-                            direction: Axis.horizontal,
-                            allowHalfRating: true,
-                            itemCount: 5,
-                            itemSize: 30,
-                            ignoreGestures: true,
-                            ratingWidget: RatingWidget(
-                              full: const Icon(Icons.star,
-                                  color: Color.fromARGB(255, 243, 201, 75)),
-                              half: const Icon(Icons.star_half,
-                                  color: Color.fromARGB(255, 243, 201, 75)),
-                              empty: const Icon(Icons.star_border,
-                                  color: Colors.grey),
-                            ),
-                            maxRating: 5,
-                            onRatingUpdate: (rating) {},
-                          ),
-                        ]
-                      ],
+                    child: SingleChildScrollView(
+                      scrollDirection: Axis.vertical,
+                      child: SingleChildScrollView(
+                        scrollDirection: Axis.horizontal,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const SizedBox(height: 6.0),
+                            const Text('  Agent\n  Information ',
+                                style: tUserTitle),
+                            // Text('  Title: $title', style: tUserBody),
+                            Text('  Username: $username', style: tUserBody),
+                            Text('  Phone Number: $phoneNumber', style: tUserBody),
+                            Text('  Email: $email', style: tUserBody),
+                            Text('  Price: $price', style: tUserBody),
+                            if (widget.role != 'admin') ...[
+                              const Text('  Agent Rating:', style: tUserBody),
+                              RatingBar(
+                                initialRating: 4.0,
+                                direction: Axis.horizontal,
+                                allowHalfRating: true,
+                                itemCount: 5,
+                                itemSize: 30,
+                                ignoreGestures: true,
+                                ratingWidget: RatingWidget(
+                                  full: const Icon(Icons.star,
+                                      color: Color.fromARGB(255, 243, 201, 75)),
+                                  half: const Icon(Icons.star_half,
+                                      color: Color.fromARGB(255, 243, 201, 75)),
+                                  empty: const Icon(Icons.star_border,
+                                      color: Colors.grey),
+                                ),
+                                maxRating: 5,
+                                onRatingUpdate: (rating) {},
+                              ),
+                            ]
+                          ],
+                        ),
+                      ),
                     ),
                   ),
                 ),
@@ -291,11 +298,39 @@ class _ViewAgentState extends State<ViewAgent> {
               ],
             ),
             const SizedBox(height: 10),
-            const Text('Associated Properties',
-                style: TextStyle(
-                    fontSize: 33,
-                    fontWeight: FontWeight.w700,
-                    color: buttonColor)),
+            Padding(
+              padding: const EdgeInsets.only(left: 15.0),
+              child: Row(
+                children: [
+                  Container(
+                    alignment: Alignment.topLeft,
+                    child: const Text('Properties',
+                        style: TextStyle(                
+                            fontSize: 33,
+                            fontWeight: FontWeight.w700,
+                            color: buttonColor)),
+                  ), 
+                      const SizedBox(width: 50.0,),
+                      ElevatedButton.icon(
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => ChatPage(
+                                  sender: 'user',
+                                  userId: useridfirebase,
+                                  agentId: widget.firebaseagentid)),
+                        );
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: buttonColor,
+                        iconColor: Colors.white),
+                      label: const Text('Chat with Agent',style: tbutton_style,),
+                      icon: const Icon(Icons.message),
+                    ),
+                ],
+              ),
+            ),
             const SizedBox(height: 10),
             Padding(
               padding: const EdgeInsets.all(12.0),
@@ -352,20 +387,7 @@ class _ViewAgentState extends State<ViewAgent> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
-                    ElevatedButton.icon(
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => ChatPage(
-                                  sender: 'user',
-                                  userId: useridfirebase,
-                                  agentId: widget.firebaseagentid)),
-                        );
-                      },
-                      label: Text('Chat'),
-                      icon: Icon(Icons.message),
-                    ),
+           
                     ElevatedButton.icon(
                       onPressed: () => _addReview(context),
                       label: const Text('Review Agent',
@@ -378,13 +400,22 @@ class _ViewAgentState extends State<ViewAgent> {
                     Tooltip(
                       message: 'Report Agent',
                       child: IconButton(
-                        onPressed: () {},
+                        onPressed: () //insert query in report agent table
+                        {},
                         icon: const Icon(Icons.report,
                             size: 45, color: buttonColor),
                       ),
                     ),
                     ElevatedButton.icon(
-                      onPressed: () {},
+                      onPressed: () {
+                          Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) =>  ViewAgentReviews()
+                            // for refresh
+                            ),
+                      );
+                      },
                       label: const Text('View Agent Reviews',
                           style: TextStyle(color: Colors.white)),
                       style: ElevatedButton.styleFrom(

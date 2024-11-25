@@ -2,10 +2,14 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:real_estate_app/Chat/pages/agentchtlogpage.dart';
+import 'package:real_estate_app/Homepage/mainpage.dart';
+import 'package:real_estate_app/Profiles/sub_pages/viewOffers.dart';
 import 'package:real_estate_app/UI/color.dart';
 import 'package:real_estate_app/UI/textstyle.dart';
 import 'package:real_estate_app/login_and_signup/Firebase/Authserviceuser.dart';
 import 'package:real_estate_app/login_and_signup/authServices.dart';
+
+//Navigator done
 
 class AgentProfile extends StatefulWidget {
   const AgentProfile({super.key});
@@ -247,13 +251,23 @@ class _AgentProfileState extends State<AgentProfile> {
                       shape: BoxShape.circle, // Makes the background circular
                     ),
                     child: IconButton(
-                      onPressed: () {},
+                      onPressed: () {
+                        Navigator.push(
+                        context,
+                        MaterialPageRoute( //to redirect tot he homepage
+                            builder: (context) => const HomePage()));
+                      },
                       color: Colors.white, // Icon color
                       icon: const Icon(Icons.house_outlined),
                     ),
                   ),
                   ElevatedButton.icon(
-                    onPressed: () {},
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => ViewOffers()));
+                    },
                     icon: const Icon(Icons.edit_document),
                     label: const Text(
                       'View Offers',

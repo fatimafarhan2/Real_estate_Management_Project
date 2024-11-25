@@ -2,8 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:real_estate_app/Chat/pages/agentlist.dart';
 import 'package:real_estate_app/Chat/pages/chatLogpage.dart';
-import 'package:real_estate_app/Profiles/sub_pages/HireAgent.dart';
-import 'package:real_estate_app/Profiles/sub_pages/viewAgent.dart';
+import 'package:real_estate_app/Homepage/mainpage.dart';
 import 'package:real_estate_app/Profiles/sub_pages/viewWishlists.dart';
 import 'package:real_estate_app/UI/color.dart';
 import 'package:real_estate_app/UI/textstyle.dart';
@@ -11,6 +10,8 @@ import 'package:real_estate_app/forms/property_details_form.dart';
 import 'package:real_estate_app/login_and_signup/Firebase/Authserviceuser.dart';
 import 'package:real_estate_app/login_and_signup/authServices.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+
+//Navigators done
 
 class UserProfile extends StatefulWidget {
   final String role;
@@ -432,7 +433,7 @@ class _UserProfileState extends State<UserProfile> {
                               width: 10,
                               height: 110, // Increased height to fit all info
                               child: ElevatedButton.icon(
-                                onPressed: () {},
+                                onPressed: () {}, //to go to that agent's View page
                                 label: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
@@ -561,10 +562,8 @@ class _UserProfileState extends State<UserProfile> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (context) => PropertyDetails()
-
+                            builder: (context) => const PropertyDetails()
                             // for refresh
-
                             ),
                       );
                     },
@@ -659,7 +658,7 @@ class _UserProfileState extends State<UserProfile> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (context) => AgentListPage()),
+                            builder: (context) => const AgentListPage()),
                       );
                     },
                     icon: const Icon(Icons.person),
@@ -685,7 +684,13 @@ class _UserProfileState extends State<UserProfile> {
                       shape: BoxShape.circle, // Makes the background circular
                     ),
                     child: IconButton(
-                      onPressed: () {},
+                      onPressed: () {
+                        Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => const HomePage()),
+                      );
+                      }, //homepage
                       color: Colors.white, // Icon color
                       icon: const Icon(Icons.house_outlined),
                     ),

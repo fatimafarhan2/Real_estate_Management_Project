@@ -7,6 +7,7 @@ import 'package:real_estate_app/login_and_signup/authServices.dart';
 import 'dart:convert';
 import 'dart:typed_data';
 import 'package:crypto/crypto.dart';
+//Navigators done for here as well
 
 class LoginInput extends StatelessWidget {
   LoginInput({super.key, required this.title, required this.role});
