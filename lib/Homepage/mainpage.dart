@@ -6,6 +6,7 @@ import 'package:real_estate_app/UI/textstyle.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 //done with navigation
+//left with status and not sold, sold
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
 

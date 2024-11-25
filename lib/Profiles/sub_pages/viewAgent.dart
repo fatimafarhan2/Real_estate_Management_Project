@@ -11,7 +11,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 double rating = 2.0;
 String review = '';
-
+//implement average rating function 
 class ViewAgent extends StatefulWidget {
   final String role;
   final String agentid;
@@ -116,6 +116,161 @@ class _ViewAgentState extends State<ViewAgent> {
     }
   }
 
+Future<void> _addReport(BuildContext context) async {
+  TextEditingController descriptionController = TextEditingController();
+  String? selectedReportType;
+  final reportTypes = ['Fraudulent', 'Harassment', 'Unresponsive']; // Dropdown options
+
+  await showDialog(
+    context: context,
+    builder: (context) {
+      return AlertDialog(
+        title: const Text('Add Property Report'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // TextField for the description
+            TextField(
+              controller: descriptionController,
+              decoration: const InputDecoration(
+                labelText: 'Report Description',
+                hintText: 'Enter a detailed description...',
+                border: OutlineInputBorder(),
+              ),
+              maxLines: 3, // Allowing multiline input
+            ),
+            const SizedBox(height: 20), // Spacing
+            // Dropdown for report type
+            DropdownButtonFormField<String>(
+              value: selectedReportType,
+              items: reportTypes.map((String type) {
+                return DropdownMenuItem(
+                  value: type,
+                  child: Text(type),
+                );
+              }).toList(),
+              onChanged: (value) {
+                selectedReportType = value!;
+              },
+              decoration: const InputDecoration(
+                labelText: 'Report Type',
+                border: OutlineInputBorder(),
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          // Cancel Button
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+            child: const Text('Cancel'),
+          ),
+          // Save Button
+          ElevatedButton.icon(
+            onPressed: () {
+              if (selectedReportType != null && descriptionController.text.isNotEmpty) {
+                print('Description: ${descriptionController.text}');
+                print('Report Type: $selectedReportType');
+                
+                String? userId = getCurrentUserIdAsString();
+                  insertAgentReport(
+                    reportType: selectedReportType!,
+                     description: descriptionController.text,
+                      clientId: userId!,
+                       agentId: widget.agentid);
+                // You can handle the saved input here
+                Navigator.of(context).pop();
+              } else {
+                print('Please fill all fields'); // Handle validation
+              }
+            },
+            icon: const Icon(Icons.save),
+            label: const Text('Save'),
+          ),
+        ],
+      );
+    },
+  );
+
+
+
+}
+
+
+//INSERTION QUERIES
+//to report agent
+
+Future<void> insertAgentReport({
+  required String reportType,
+  required String description,
+  required String clientId,
+  required String agentId,
+}) async {
+  try {
+    final response = await Supabase.instance.client
+        .from('agent_reports') // Table name
+        .insert({
+          'report_type': reportType,          // Type of report (Fraudulent, Harassment, Unresponsive)
+          'description': description,         // Detailed description of the report
+          'client_id': clientId,              // Client ID (UUID)
+          'agent_id': agentId,                // Agent ID (UUID)
+          'date': DateTime.now().toIso8601String(), // Optional: Defaults to CURRENT_DATE in the table
+        });
+
+    if (response == null) {
+      // Successful insertion
+      print('Agent report inserted successfully!');
+    } else {
+      // Handle Supabase error
+      print('Error:Unknown error occurred');
+    }
+  } catch (e) {
+    // Handle unexpected errors
+    print('Failed to insert agent report: $e');
+  }
+}
+
+
+
+//for reviews
+Future<void> insertAgentReview({
+  required double rating,
+  required String? comments,
+  required String clientId,
+  required String agentId,
+}) async {
+  try {
+    final response = await Supabase.instance.client
+        .from('agent_review') // Table name
+        .insert({
+          'rating': rating,             
+          'comments': comments,         
+          'client_id': clientId,         
+          'agent_id': agentId,           
+          'date': DateTime.now().toIso8601String(), // Optional: Defaults to CURRENT_DATE in the table
+        });
+
+    if (response == null ) {
+      // Successful insertion
+      print('Agent review inserted successfully!');
+    } else {
+      // Handle Supabase error
+      print('Error:"Unknown error occurred"}');
+    }
+  } catch (e) {
+    // Handle unexpected errors
+    print('Failed to insert agent review: $e');
+  }
+}
+
+
+String? getCurrentUserIdAsString() {
+  final user = Supabase.instance.client.auth.currentUser;
+  return user?.id; // Returns the user's UUID as a String or null if not logged in
+}
+
   Future<void> _addReview(BuildContext context) async {
     TextEditingController inputController = TextEditingController();
     TextEditingController ratingController = TextEditingController();
@@ -187,10 +342,16 @@ class _ViewAgentState extends State<ViewAgent> {
           ),
           ElevatedButton.icon(
             onPressed: () {
+              final userId = getCurrentUserIdAsString();
               setState(() {
                 review = inputController.text;
                 print('Rating: $rating');
                 print('Review: $review');
+                insertAgentReview(
+                  rating: rating, 
+                  comments: inputController.text, 
+                  clientId: userId!, 
+                  agentId: widget.agentid);
               });
               Navigator.of(context).pop();
             },
@@ -201,6 +362,7 @@ class _ViewAgentState extends State<ViewAgent> {
       ),
     );
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -260,7 +422,7 @@ class _ViewAgentState extends State<ViewAgent> {
                             Text('  Username: $username', style: tUserBody),
                             Text('  Phone Number: $phoneNumber', style: tUserBody),
                             Text('  Email: $email', style: tUserBody),
-                            Text('  Price: $price', style: tUserBody),
+                            Text('  Hiring Fees: $price', style: tUserBody),
                             if (widget.role != 'admin') ...[
                               const Text('  Agent Rating:', style: tUserBody),
                               RatingBar(
@@ -400,8 +562,7 @@ class _ViewAgentState extends State<ViewAgent> {
                     Tooltip(
                       message: 'Report Agent',
                       child: IconButton(
-                        onPressed: () //insert query in report agent table
-                        {},
+                        onPressed: () => _addReport(context),
                         icon: const Icon(Icons.report,
                             size: 45, color: buttonColor),
                       ),

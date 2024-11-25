@@ -47,6 +47,10 @@ class _PropertyviewState extends State<Propertyview> {
   String sellerPhoneNumber = '';
   String sellerEmail = '';
 
+           
+  
+  
+
 // Fetching property details
   Future<void> fetchPropertiesInfo() async {
     try {
@@ -75,6 +79,8 @@ class _PropertyviewState extends State<Propertyview> {
           status = propertyData['status'] ?? '';
           titl = propertyData['title'] ?? '';
           city = propertyData['city'] ?? '';
+          
+
         });
       }
     } catch (e) {
@@ -128,7 +134,179 @@ class _PropertyviewState extends State<Propertyview> {
     }
   }
 
-  Future<void> _addComment(BuildContext context) async {
+//-----------------------------------INSERTION QUERIES------------------------------------\\
+
+//WISHLIST INSERTION 
+Future<void> insertWishlist(int propertyId, String clientId) async {
+  try {
+    final response = await Supabase.instance.client
+        .from('wishlist') // Table name
+        .insert({
+          'property_id': propertyId, // Property ID
+          'client_id': clientId,     // Client ID (UUID)
+          'date_added': DateTime.now().toIso8601String() // Optional: Can omit since default is CURRENT_DATE
+        });
+
+    if (response != null) {
+      // Successful insertion
+      print('Wishlist entry added successfully!');
+    }
+  } catch (e) {
+    // Handle unexpected errors
+    print('Failed to insert into wishlist: $e');
+  }
+}
+
+//property review insertion
+Future<void> insertPropertyReview({
+  required String? comments,
+  required String clientId,
+  required int propertyId,
+}) async {
+  try {
+    final response = await Supabase.instance.client
+        .from('property_review') // Table name
+        .insert({   // Rating (1-5)
+          'comments': comments,            // Optional comments
+          'client_id': clientId,           // Client ID (UUID)
+          'property_id': propertyId,       // Property ID
+          'date': DateTime.now().toIso8601String(), // Optional: Defaults to CURRENT_DATE in the table
+        });
+
+    if (response == null) {
+      // Successful insertion
+      print('Property review inserted successfully!');
+    } else {
+      // Handle Supabase error
+      print('Error: "Unknown error occurred"');
+    }
+  } catch (e) {
+    // Handle unexpected errors
+    print('Failed to insert property review: $e');
+  }
+}
+
+
+
+
+
+//PROPERTY REPORT INSERTION
+Future<void> insertPropertyReport({
+  required String reportType,
+  required String description,
+  required String clientId,
+  required int propertyId,
+}) async {
+  
+  try {
+    final response = await Supabase.instance.client
+        .from('property_reports') // Table name
+        .insert({
+          'report_type': reportType,     // Type of report (e.g., Issue, Complaint)
+          'description': description,   // Detailed description of the report
+          'client_id': clientId,         // Client ID (UUID)
+          'property_id': propertyId,     // Property ID
+          'date': DateTime.now().toIso8601String(), // Optional: Defaults to CURRENT_DATE in the table
+        });
+        
+    if (response == null) {
+      // Successful insertion
+      print('Property report inserted successfully!');
+    } else {
+      // Handle Supabase error
+      throw Exception('Error');
+    }
+  } catch (e) {
+    // Handle unexpected errors
+    print('Failed to insert property report: $e');
+  }
+}
+
+//show dialogue for report creation 
+Future<void> _addReport(BuildContext context) async {
+  TextEditingController descriptionController = TextEditingController();
+  String? selectedReportType;
+  final reportTypes = ['Issue', 'Complaint', 'Damage', 'Fraudulent']; // Dropdown options
+
+  await showDialog(
+    context: context,
+    builder: (context) {
+      return AlertDialog(
+        title: const Text('Add Property Report'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // TextField for the description
+            TextField(
+              controller: descriptionController,
+              decoration: const InputDecoration(
+                labelText: 'Report Description',
+                hintText: 'Enter a detailed description...',
+                border: OutlineInputBorder(),
+              ),
+              maxLines: 3, // Allowing multiline input
+            ),
+            const SizedBox(height: 20), // Spacing
+            // Dropdown for report type
+            DropdownButtonFormField<String>(
+              value: selectedReportType,
+              items: reportTypes.map((String type) {
+                return DropdownMenuItem(
+                  value: type,
+                  child: Text(type),
+                );
+              }).toList(),
+              onChanged: (value) {
+                selectedReportType = value!;
+              },
+              decoration: const InputDecoration(
+                labelText: 'Report Type',
+                border: OutlineInputBorder(),
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          // Cancel Button
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+            child: const Text('Cancel'),
+          ),
+          // Save Button
+          ElevatedButton.icon(
+            onPressed: () {
+              if (selectedReportType != null && descriptionController.text.isNotEmpty) {
+                print('Description: ${descriptionController.text}');
+                print('Report Type: $selectedReportType');
+                
+                String? userId = getCurrentUserIdAsString();
+                  insertPropertyReport(
+                        reportType: selectedReportType!,
+                         description: descriptionController.text, 
+                         clientId: userId!,
+                          propertyId: widget.propertyid);
+                // You can handle the saved input here
+                Navigator.of(context).pop();
+              } else {
+                print('Please fill all fields'); // Handle validation
+              }
+            },
+            icon: const Icon(Icons.save),
+            label: const Text('Save'),
+          ),
+        ],
+      );
+    },
+  );
+
+
+
+}
+
+//create comment
+Future<void> _addComment(BuildContext context) async {
     TextEditingController inputController = TextEditingController();
 
     await showDialog(
@@ -155,6 +333,12 @@ class _PropertyviewState extends State<Propertyview> {
                 userComment = inputController.text;
                 print(userComment);
               });
+              String? userId = getCurrentUserIdAsString();
+              insertPropertyReview(
+                comments: userComment,
+                clientId: userId!,
+                propertyId: widget.propertyid);
+
               Navigator.of(context).pop();
             },
             icon: const Icon(Icons.save),
@@ -165,43 +349,53 @@ class _PropertyviewState extends State<Propertyview> {
     );
   }
 
+
+
+String? getCurrentUserIdAsString() {
+  final user = Supabase.instance.client.auth.currentUser;
+  return user?.id; // Returns the user's UUID as a String or null if not logged in
+}
+
   @override
   void initState() {
     super.initState();
     fetchPropertiesInfo(); // Fetch property info
     fetchUserInfo(); // Fetch user info (seller)
     fetchAgentInfo();
+  
   }
 
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
-        title: const Text(
-          'Sage Appartments',
-          style: tappbar_style,
-        ),
+        // title: const Text(
+        //   'Pr',
+        //   style: tappbar_style,
+        // ),
         actions: [          
-              ElevatedButton(
-                  onPressed: () {
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => const OfferForm()
-                            // for refresh
-                            ),
-                      );
-                  },
-                  style: ElevatedButton.styleFrom(
-                        iconColor: const Color.fromARGB(255, 203, 208, 189),
-                        backgroundColor: const Color.fromARGB(255, 2, 41, 19),
-                  
-                  ),
-                  child: const Text(
-                    'Create an Offer',
-                    style: TextStyle(
-                              color: Color.fromARGB(255, 203, 208, 189)))
-                  )
+              Center(
+                child: ElevatedButton(
+                    onPressed: () {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => const OfferForm()
+                              // for refresh
+                              ),
+                        );
+                    },
+                    style: ElevatedButton.styleFrom(
+                          iconColor: const Color.fromARGB(255, 203, 208, 189),
+                          backgroundColor: const Color.fromARGB(255, 2, 41, 19),
+                    
+                    ),
+                    child: const Text(
+                      'Create an Offer',
+                      style: TextStyle(
+                                color: Color.fromARGB(255, 203, 208, 189)))
+                    ),
+              )
         ],
       ),
       backgroundColor: propertyBGColor,
@@ -216,7 +410,7 @@ class _PropertyviewState extends State<Propertyview> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   ElevatedButton.icon(
-                    onPressed: () {},
+                    onPressed: ()=>_addReport(context),
                     label: const Text(
                       'Report',
                       style:
@@ -229,7 +423,19 @@ class _PropertyviewState extends State<Propertyview> {
                     ),
                   ),
                   ElevatedButton.icon(
-                    onPressed: () {},
+                    onPressed: () { //success
+                      //insert to wishlist 
+                          String? userId = getCurrentUserIdAsString();
+                        if (userId != null) {
+                          print('Current User ID: $userId');
+                          
+                        } else {
+                          print('No user is logged in.');
+                        }
+                        
+                      insertWishlist(widget.propertyid, userId!);
+
+                    },
                     label: const Text(
                       'Wishlist+',
                       style:

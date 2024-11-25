@@ -1,8 +1,10 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:real_estate_app/Admin/display_screen/viewagent.dart';
 import 'package:real_estate_app/Chat/pages/agentlist.dart';
 import 'package:real_estate_app/Chat/pages/chatLogpage.dart';
 import 'package:real_estate_app/Homepage/mainpage.dart';
+import 'package:real_estate_app/Profiles/sub_pages/viewAgent.dart';
 import 'package:real_estate_app/Profiles/sub_pages/viewWishlists.dart';
 import 'package:real_estate_app/UI/color.dart';
 import 'package:real_estate_app/UI/textstyle.dart';
@@ -433,7 +435,7 @@ class _UserProfileState extends State<UserProfile> {
                               width: 10,
                               height: 110, // Increased height to fit all info
                               child: ElevatedButton.icon(
-                                onPressed: () {}, //to go to that agent's View page
+                                onPressed: () { }, //to go to that agent's View page
                                 label: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [

@@ -52,7 +52,7 @@ class _OfferFormState extends State<OfferForm> {
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Center(
+             const Center(
                 child: Text(
                   'Place new offer',
                   style: TextStyle(fontSize: 25, fontWeight: FontWeight.w800),
@@ -154,7 +154,7 @@ class _OfferFormState extends State<OfferForm> {
               Center(
                 child: ElevatedButton(
                   onPressed: () {
-        
+
                   },
                   style: ElevatedButton.styleFrom(
                     minimumSize: Size(200, 50),
