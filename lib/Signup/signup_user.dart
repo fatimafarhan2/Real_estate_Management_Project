@@ -263,7 +263,7 @@ class _SignupPageUserState extends State<SignupPageUser> {
                           usernameController.text,
                           context);
                       //firebase signup
-                      await authfireservice.authenticateUser(
+                      bool resp = await authfireservice.authenticateUser(
                           email: emailController.text,
                           password: passwordController.text,
                           isLogin: false,
