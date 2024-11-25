@@ -88,6 +88,7 @@ class _ViewPropertyReportsState extends State<ViewPropertyReports> {
         'description'
       ],
       isLoading: isLoading,
+      action: 'propertyreport',
     );
   }
 }

@@ -88,6 +88,7 @@ class _ViewAgentReportsState extends State<ViewAgentReports> {
         'description'
       ],
       isLoading: isLoading,
+      action: 'agentreport',
     );
   }
 }

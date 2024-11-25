@@ -47,7 +47,7 @@ class AgentListPage extends StatelessWidget {
             itemBuilder: (context, index) {
               final agent = agents[index];
               final agentEmail = agent['email'] ?? 'No email available';
-
+              print(agent);
               return Card(
                 margin:
                     const EdgeInsets.symmetric(vertical: 10, horizontal: 15),

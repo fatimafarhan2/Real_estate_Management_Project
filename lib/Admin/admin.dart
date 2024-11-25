@@ -8,9 +8,22 @@ import 'package:real_estate_app/Admin/display_screen/viewpropertyreports.dart';
 import 'package:real_estate_app/Admin/display_screen/viewseller.dart';
 import 'package:real_estate_app/UI/color.dart';
 import 'package:real_estate_app/UI/textstyle.dart';
+import 'package:real_estate_app/login_and_signup/Firebase/Authserviceuser.dart';
+import 'package:real_estate_app/login_and_signup/authServices.dart';
 
 class Admin extends StatelessWidget {
   const Admin({super.key});
+
+  void firebaselogout() {
+    final auth = AuthServicesUser();
+    auth.logout();
+  }
+
+// logout
+  void Supabaselogout() {
+    final auth = Authservices();
+    auth.signOut();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -18,6 +31,14 @@ class Admin extends StatelessWidget {
       appBar: AppBar(
         iconTheme: IconThemeData(color: iconColor),
         centerTitle: true,
+        leading: IconButton(
+          color: scaffoldColor,
+          icon: const Icon(Icons.logout), // Logout icon
+          onPressed: () {
+            Supabaselogout();
+            firebaselogout();
+          },
+        ),
         title: Text(
           'ADMIN',
           style: tappbar_style,
@@ -111,7 +132,7 @@ class Admin extends StatelessWidget {
                   Flexible(
                     child: containers_admin(
                       str: Text(
-                        'View Request List',
+                        'View Property Reports',
                         style: tbody_style,
                         textAlign: TextAlign.center,
                       ),
@@ -128,7 +149,7 @@ class Admin extends StatelessWidget {
                   Flexible(
                     child: containers_admin(
                       str: Text(
-                        'View Reports',
+                        'View Agent Reports',
                         style: tbody_style,
                         textAlign: TextAlign.center,
                       ),

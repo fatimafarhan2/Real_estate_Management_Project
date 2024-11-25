@@ -1,11 +1,12 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
 
 class AuthServicesUser {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
-  Future<void> authenticateUser({
+  Future<bool> authenticateUser({
     required String email,
     required String password,
     required bool isLogin,
@@ -29,7 +30,7 @@ class AuthServicesUser {
 
         final user = userCredential.user;
         if (user == null) {
-          throw Exception('Failed to authenticate user');
+          return false;
         }
 
         DocumentReference userDoc = _firestore
@@ -61,7 +62,7 @@ class AuthServicesUser {
 
         final user = userCredential.user;
         if (user == null) {
-          throw Exception('Failed to create user');
+          return false;
         }
 
         await _firestore
@@ -73,8 +74,13 @@ class AuthServicesUser {
           'role': role,
         });
       }
+
+      // Return true if everything was successful
+      return true;
     } on FirebaseAuthException catch (e) {
-      throw Exception(e.code);
+      // Log error or handle it
+      print('Authentication error: $e');
+      return false;
     }
   }
 
@@ -85,6 +91,33 @@ class AuthServicesUser {
       print("User logged out successfully");
     } catch (e) {
       print('Error during logout: $e');
+    }
+  }
+
+  Future<void> deleteAgentByEmail(String agentEmail) async {
+    try {
+      // Get Firestore instance
+      FirebaseFirestore firestore = FirebaseFirestore.instance;
+
+      // Query the 'agents' collection to find the document by email
+      QuerySnapshot querySnapshot = await firestore
+          .collection('agents')
+          .where('email', isEqualTo: agentEmail)
+          .get();
+
+      if (querySnapshot.docs.isNotEmpty) {
+        // If the agent with the email exists, get the document reference
+        DocumentSnapshot agentDoc = querySnapshot.docs.first;
+
+        // Delete the agent document
+        await agentDoc.reference.delete();
+
+        print('Agent deleted successfully');
+      } else {
+        print('No agent found with email: $agentEmail');
+      }
+    } catch (e) {
+      print('Error deleting agent: $e');
     }
   }
 }

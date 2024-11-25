@@ -163,18 +163,18 @@ class _SignupPageAgentState extends State<SignupPageAgent> {
                       // Placeholder for signup action
                       bool result = await authServices.signUpUserAgent(
                           'agent',
-                          addressController.text, 
-                          firstNameController.text, 
-                          lastNameController.text, 
-                          phoneNumberController.text, 
-                          emailController.text, 
-                          hashPassword(passwordController.text), 
+                          addressController.text,
+                          firstNameController.text,
+                          lastNameController.text,
+                          phoneNumberController.text,
+                          emailController.text,
+                          hashPassword(passwordController.text),
                           double.parse(priceController.text),
                           fPath,
                           usernameController.text,
                           context);
                       // Firebase signup
-                      await authfireservice.authenticateUser(
+                      bool resp = await authfireservice.authenticateUser(
                         email: emailController.text,
                         password: passwordController.text,
                         isLogin: false,
@@ -186,7 +186,8 @@ class _SignupPageAgentState extends State<SignupPageAgent> {
 
                       // Use the showErrorSnackbar function to display success or failure message
                       if (result == false) {
-                        showErrorSnackbar('Error in signing up', context);
+                        if (resp == false)
+                          showErrorSnackbar('Error in signing up', context);
                       } else {
                         showErrorSnackbar('Successful in signing up', context);
                       }

@@ -4,18 +4,20 @@ import 'package:real_estate_app/UI/color.dart';
 import 'package:real_estate_app/UI/textstyle.dart';
 
 class DisplayDetails extends StatelessWidget {
-  DisplayDetails({
-    Key? key,
-    required this.emptyBodyText,
-    required this.appBarTitle,
-    required this.showAllItems,
-    required this.items, // Generic data list
-    required this.fieldLabels, // Labels for each field
-    required this.fieldKeys, // Keys for each field in data
-    required this.isLoading,
-  }) : super(key: key);
+  DisplayDetails(
+      {Key? key,
+      required this.emptyBodyText,
+      required this.appBarTitle,
+      required this.showAllItems,
+      required this.items, // Generic data list
+      required this.fieldLabels, // Labels for each field
+      required this.fieldKeys, // Keys for each field in data
+      required this.isLoading,
+      required this.action})
+      : super(key: key);
 
   final String emptyBodyText;
+  final String action;
   final bool showAllItems;
   final List<Map<String, dynamic>> items;
   final List<String>
@@ -48,6 +50,7 @@ class DisplayDetails extends StatelessWidget {
           : filteredItems.isEmpty
               ? Center(child: Text(emptyBodyText))
               : ListViewCard(
+                  action: action,
                   filteredItems: filteredItems,
                   fieldLabels: fieldLabels,
                   fieldKeys: fieldKeys,

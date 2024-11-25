@@ -32,17 +32,17 @@ class _ViewRequestState extends State<ViewRequest> {
   void initState() {
     super.initState();
     // printCurrentUser();
-    fetchAgents();
+    fetchRequests();
   }
 
-  Future<void> fetchAgents() async {
+  Future<void> fetchRequests() async {
     try {
       print('Fetching agents...');
       //extracting Data
       final response = await client.from('requests').select();
       setState(() {
         agents = List<Map<String, dynamic>>.from(response);
-        print('Data recieved');
+        print(agents);
         isLoading = false;
       });
     } catch (e) {
@@ -73,15 +73,16 @@ class _ViewRequestState extends State<ViewRequest> {
       appBarTitle: "Requests",
       showAllItems: true,
       items: agents,
-      fieldLabels: const ['Request', 'Date', 'Reported by', 'User', 'Property'],
+      fieldLabels: const ['Request', 'Date', 'Status', 'User', 'Property'],
       fieldKeys: const [
         'request_id',
         'date',
-        'status'
-            'client_id',
+        'status',
+        'client_id',
         'property_id',
       ],
       isLoading: isLoading,
+      action: 'request',
     );
   }
 }
