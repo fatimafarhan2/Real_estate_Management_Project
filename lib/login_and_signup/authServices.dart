@@ -42,7 +42,7 @@ class Authservices {
               profileFpath ?? '', // Provide a default value if null
           '_role': role,
           '_price': role == 'agent' ? price : 0, // Only pass price for agents
-        }); 
+        });
 
         print('User signed up and related data inserted successfully');
 

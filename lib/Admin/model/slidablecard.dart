@@ -32,19 +32,6 @@ class _ListViewCardSlidableState extends State<ListViewCardSlidable> {
   final AuthServicesUser _auth = AuthServicesUser();
 
 // ------------------DELETON FUNCTIONS-------------------------------
-  Future<void> deleteUser(String userId, String email) async {
-    final response = await Supabase.instance.client.rpc('delete_user', params: {
-      'user_id': userId,
-    });
-
-    if (response != null) {
-      print('Error deleting user: ${response.error!.message}');
-    } else {
-      _auth.deleteUserByEmail(email);
-      print('User deleted successfully');
-    }
-  }
-
   Future<void> deleteAgent(String agentId, String email) async {
     final response =
         await Supabase.instance.client.rpc('delete_agent', params: {
@@ -56,6 +43,19 @@ class _ListViewCardSlidableState extends State<ListViewCardSlidable> {
     } else {
       _auth.deleteAgentByEmail(email);
       print('Agent deleted successfully');
+    }
+  }
+
+  Future<void> deleteUser(String userId, String email) async {
+    final response = await Supabase.instance.client.rpc('delete_user', params: {
+      'user_id': userId,
+    });
+
+    if (response != null) {
+      print('Error deleting user: ${response.error!.message}');
+    } else {
+      _auth.deleteUserByEmail(email);
+      print('User deleted successfully');
     }
   }
 

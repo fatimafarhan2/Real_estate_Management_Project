@@ -52,7 +52,7 @@ class _OfferFormState extends State<OfferForm> {
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-             const Center(
+              const Center(
                 child: Text(
                   'Place new offer',
                   style: TextStyle(fontSize: 25, fontWeight: FontWeight.w800),
@@ -102,7 +102,7 @@ class _OfferFormState extends State<OfferForm> {
                 TextFormField(
                   controller: offerAmountController,
                   keyboardType: TextInputType.number,
-                  decoration: InputDecoration(
+                  decoration: const InputDecoration(
                     fillColor: boxcolor,
                     labelText: 'Offer Amount',
                     hintText: 'Enter amount',
@@ -119,7 +119,8 @@ class _OfferFormState extends State<OfferForm> {
                   height: 30,
                   child: Text(
                     'Installment Price: \$${calculatedInstallmentPrice.toStringAsFixed(2)}',
-                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                    style: const TextStyle(
+                        fontSize: 20, fontWeight: FontWeight.bold),
                   ),
                 ),
 
@@ -150,12 +151,10 @@ class _OfferFormState extends State<OfferForm> {
                   ],
                 ),
 
-              SizedBox(height: 25),
+              const SizedBox(height: 25),
               Center(
                 child: ElevatedButton(
-                  onPressed: () {
-
-                  },
+                  onPressed: () {},
                   style: ElevatedButton.styleFrom(
                     minimumSize: Size(200, 50),
                     backgroundColor: buttonColor,

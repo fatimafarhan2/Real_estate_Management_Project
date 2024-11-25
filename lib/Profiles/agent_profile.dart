@@ -101,7 +101,7 @@ class _AgentProfileState extends State<AgentProfile> {
     try {
       final data = await client
           .from('appointments')
-          .select('date, buyer_id, meetaddress')
+          .select('date, buyer_id, meet_address')
           .eq('agent_id', agentid);
 
       if (data == null || data.isEmpty) {
@@ -238,29 +238,45 @@ class _AgentProfileState extends State<AgentProfile> {
               ),
             ),
             Container(
+              padding: const EdgeInsets.all(6.0),
+              height: 200,
+              width: 390,
               decoration: BoxDecoration(
-                color: boxcolor,
-                border: Border.all(width: 5.0, style: BorderStyle.solid),
+                color: drawerBoxColorTwo,
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.2), // Shadow color
+                    blurRadius: 15, // Softness of the shadow
+                    spreadRadius: 0.8, // Extend the shadow
+                    offset: const Offset(10, 10), // Position of the shadow
+                  ),
+                ],
                 borderRadius: BorderRadius.circular(20.0),
               ),
-              height: 300,
-              width: 500,
               child: SingleChildScrollView(
-                  child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: appointments.map((appointment) {
-                    return Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Text(
-                        'Date: ${appointment['date']} \nBuyer: ${appointment['buyer_id']} \nLocation: ${appointment['meetaddress']}',
-                        style: tAppointmentBody,
-                      ),
-                    );
-                  }).toList(),
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: appointments.map((appointment) {
+                      return Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Card(
+                          color: buttonColor,
+                          margin: const EdgeInsets.all(2.0),
+                          elevation: 5.0,
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(20.0)),
+                          child: Text(
+                            'Date: ${appointment['date']} \nBuyer: ${appointment['buyer_id']} \nLocation: ${appointment['meet_address']}',
+                            style: tAppointmentButton,
+                          ),
+                        ),
+                      );
+                    }).toList(),
+                  ),
                 ),
-              )),
+              ),
             ),
             SizedBox(
               height: 10,
