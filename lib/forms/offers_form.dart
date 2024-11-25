@@ -154,13 +154,13 @@ class _OfferFormState extends State<OfferForm> {
               Center(
                 child: ElevatedButton(
                   onPressed: () {
-                    // Placeholder for submit action
+        
                   },
                   style: ElevatedButton.styleFrom(
                     minimumSize: Size(200, 50),
                     backgroundColor: buttonColor,
                   ),
-                  child: Text(
+                  child: const Text(
                     'Submit',
                     style: tbutton_style,
                   ),
