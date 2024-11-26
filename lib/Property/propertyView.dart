@@ -44,6 +44,7 @@ class _PropertyviewState extends State<Propertyview> {
   String titl = '\0';
   String city = '';
   String sellerid = '';
+  String interval_month = '';
   // Seller information variables
   String sellerUsername = '';
   String sellerPhoneNumber = '';
@@ -139,6 +140,7 @@ class _PropertyviewState extends State<Propertyview> {
           status = propertyData['status'] ?? '';
           titl = propertyData['title'] ?? '';
           city = propertyData['city'] ?? '';
+          interval_month = propertyData['max_time_period'] ?? '';
         });
       }
     } catch (e) {
@@ -438,7 +440,14 @@ class _PropertyviewState extends State<Propertyview> {
                 onPressed: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => const OfferForm()
+                    MaterialPageRoute(
+                        builder: (context) => OfferForm(
+                              property_id: widget.propertyid,
+                              price: price,
+                              interval_mon: interval_month,
+                              agentid: agentId,
+                              buyerid: clientId,
+                            )
                         // for refresh
                         ),
                   );

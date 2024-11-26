@@ -1,152 +1,188 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
-import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:real_estate_app/UI/color.dart';
 import 'package:real_estate_app/UI/textstyle.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
+class ViewOffers extends StatefulWidget {
+  final String agentid;
 
-//implement if else bool vaibale to check when to select all agents or when to select agents associated with a specific user
-class ViewOffers extends StatelessWidget {
- ViewOffers({super.key});
- final List<Map<String, String>> offers = [
-    {
-      'Property Name': 'Sage Villa',
-      'Buyer Name': '[Name]',
-      'Offer Creation Date': '2024-11-09',
-      'Seller Name' : "[Name]",
-    },
-    {
-      'Property Name': 'Sage Condo',
-      'Buyer Name': '[Name]',
-      'Offer Creation Date': '2021-11-09',
-      'Seller Name' : "[Name]",
-    },
-    {
-      'Property Name': 'Sage Apartments',
-      'Buyer Name': '[Name]',
-      'Offer Creation Date': '2024-11-19',
-      'Seller Name' : "[Name]",
-    },
-    {
-      'Property Name': 'Sage Villa',
-      'Buyer Name': '[Name]',
-      'Offer Creation Date': '2024-11-09',
-      'Seller Name' : "[Name]",
-    },
-    {
-      'Property Name': 'Sage Condo',
-      'Buyer Name': '[Name]',
-      'Offer Creation Date': '2021-11-09',
-      'Seller Name' : "[Name]",
-    },
-    {
-      'Property Name': 'Sage Apartments',
-      'Buyer Name': '[Name]',
-      'Offer Creation Date': '2024-11-19',
-      'Seller Name' : "[Name]",
-    },
-   {
-      'Property Name': 'Sage Villa',
-      'Buyer Name': '[Name]',
-      'Offer Creation Date': '2024-11-09',
-      'Seller Name' : "[Name]",
-    },
-    {
-      'Property Name': 'Sage Condo',
-      'Buyer Name': '[Name]',
-      'Offer Creation Date': '2021-11-09',
-      'Seller Name' : "[Name]",
-    },
-    {
-      'Property Name': 'Sage Apartments',
-      'Buyer Name': '[Name]',
-      'Offer Creation Date': '2024-11-19',
-      'Seller Name' : "[Name]",
-    },
-    {
-      'Property Name': 'Sage Villa',
-      'Buyer Name': '[Name]',
-      'Offer Creation Date': '2024-11-09',
-      'Seller Name' : "[Name]",
-    },
-    {
-      'Property Name': 'Sage Condo',
-      'Buyer Name': '[Name]',
-      'Offer Creation Date': '2021-11-09',
-      'Seller Name' : "[Name]",
-    },
-    {
-      'Property Name': 'Sage Apartments',
-      'Buyer Name': '[Name]',
-      'Offer Creation Date': '2024-11-19',
-      'Seller Name' : "[Name]",
-    }, 
-  ];
+  const ViewOffers({Key? key, required this.agentid}) : super(key: key);
+
+  @override
+  _ViewOffersState createState() => _ViewOffersState();
+}
+
+class _ViewOffersState extends State<ViewOffers> {
+  List<Map<String, dynamic>> offers = []; // Store fetched offers
+  bool isLoading = true;
+  String offerid = '';
+  @override
+  void initState() {
+    super.initState();
+    fetchOffers();
+  }
+
+  Future<void> setOfferstatus(int offerId, String status) async {
+    final supabase = Supabase.instance.client;
+
+    try {
+      final response = await supabase.from('offers').update(
+              {'offer_status': status}) // Update the status to 'disapproved'
+          .eq('offer_id', offerId); // Filter by offer_id
+
+      if (response == null) {
+        // Update the UI after the status update
+        fetchOffers();
+        // print('Offer $offerId disapproved successfully!');
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Offer $status  Successfuly')),
+        );
+      } else {
+        print('Failed to disapprove the offer.');
+      }
+    } catch (error) {
+      print('Error updating status: $error');
+    }
+  }
+
+  Future<void> fetchOffers() async {
+    final supabase = Supabase.instance.client;
+
+    try {
+      final response = await supabase
+          .from('offers')
+          .select('*, client(username), properties(title)')
+          .eq('agent_id', widget.agentid); // Filter by agent ID
+
+      if (response != null && response is List) {
+        // Map response into the offers list
+        setState(() {
+          offers = response.map((offer) {
+            return {
+              'Property Name': offer['properties']['title'] ?? 'Unknown',
+              'Buyer Name': offer['client']['username'] ?? 'Anonymous',
+              'Installment Amount': offer['installment_amount'] ?? '',
+              'Installment Time Period': offer['installment_time_period'] ?? '',
+              'Bargain Price': offer['total_price'] ?? '',
+              'offer id': offer['offer_id'] ?? '',
+            };
+          }).toList();
+
+          isLoading = false;
+        });
+      } else {
+        setState(() {
+          isLoading = false;
+        });
+      }
+    } catch (error) {
+      print('Error fetching offers: $error');
+      setState(() {
+        isLoading = false;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    return  Scaffold(
-        appBar: AppBar(
-          title: const Text('View Offers', 
-          style: tappbar_style,),
-          backgroundColor: buttonColor,
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text(
+          'View Offers',
+          style: tappbar_style,
         ),
-        backgroundColor: propertyBGColor,
-
-      body: offers.isEmpty
-            ? const Center(child: const Text('No Offers Recieved...'))
-            : ListView.builder(
-              itemCount: offers.length,
-              itemBuilder: (context, index){
-                final offer = offers[index];
-                return Padding(
-                  padding:  const EdgeInsets.all(6.0),
-                  child: Slidable(
-                    key: ValueKey(index),
-                    endActionPane: ActionPane(
-                      motion: const ScrollMotion(), 
-                    children: [
-                      SlidableAction(onPressed: (context)
-                      {
-                        //will add db functiionality
-                      },
-                      foregroundColor: Colors.white,
-                      backgroundColor: Colors.green,
-                      icon: Icons.view_carousel,
-                      label: 'View Offer',
-                      
-                      )
-                    ]),
-                    child: Card(
-                      elevation: 3,
-                      child: ListTile(
-                        title: Text('Poperty Name: ${offer['Property Name'] ?? ''}',
-                        style: tAppointmentBody,
+        backgroundColor: buttonColor,
+      ),
+      backgroundColor: propertyBGColor,
+      body: isLoading
+          ? const Center(
+              child:
+                  CircularProgressIndicator()) // Show a loader while fetching data
+          : offers.isEmpty
+              ? const Center(
+                  child: Text('No Offers Received...', style: tUserBody))
+              : ListView.builder(
+                  itemCount: offers.length,
+                  itemBuilder: (context, index) {
+                    final offer = offers[index];
+                    return Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Card(
+                        elevation: 3,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
                         ),
-                        subtitle: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [ Text(
-                              'Buyer Name: ${offer['Buyer Name'] ?? 'Anonymous'}',
-                              style: tUserBody,
-                            ),
-                            Text(
-                              'Seller Name: ${offer['Seller Name'] ?? ''}',
-                              style: tUserBody,
-                            ),
-                            Text(
-                              'Date: ${offer['Offer Creation Date'] ?? ''}',
-                              style: tUserBody,
-                            ),
+                        child: Padding(
+                          padding: const EdgeInsets.all(10.0),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Property Name: ${offer['Property Name']}',
+                                style: tAppointmentBody,
+                              ),
+                              const SizedBox(height: 5),
+                              Text(
+                                'Buyer Name: ${offer['Buyer Name']}',
+                                style: tUserBody,
+                              ),
+                              const SizedBox(height: 5),
+                              Text(
+                                'Installment Amount: ${offer['Installment Amount']}',
+                                style: tUserBody,
+                              ),
+                              const SizedBox(height: 5),
+                              Text(
+                                'Installment Time Period: ${offer['Installment Time Period']}',
+                                style: tUserBody,
+                              ),
+                              const SizedBox(height: 5),
+                              Text(
+                                'Bargain Price: ${offer['Bargain Price']}',
+                                style: tUserBody,
+                              ),
+                              const SizedBox(height: 10),
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  ElevatedButton.icon(
+                                    onPressed: () {
+                                      int offerid = offers[index]['offer id'];
+                                      setOfferstatus(offerid, 'Approved');
+                                      // Add logic for approving the offer
+                                      print('Offer approved: ${offer}');
+                                    },
+                                    icon: const Icon(Icons.check),
+                                    label: const Text('Approve'),
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: Colors.green,
+                                    ),
+                                  ),
+                                  ElevatedButton.icon(
+                                    onPressed: () {
+                                      // Add logic for rejecting the offer
+                                      int offerid = offers[index]['offer id'];
+                                      setOfferstatus(offerid, 'Disapproved');
+                                      print('Offer rejected: ${offer}');
+                                    },
+                                    icon: const Icon(Icons.close),
+                                    label: const Text('Reject'),
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: Colors.red,
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ],
+                          ),
                         ),
-                        leading: const Icon(Icons.dashboard_customize, color: Colors.green,),
                       ),
-                    )
-                    ),
-                  );
-              },
-            )
-            ,
-
+                    );
+                  },
+                ),
     );
   }
-}  
+}

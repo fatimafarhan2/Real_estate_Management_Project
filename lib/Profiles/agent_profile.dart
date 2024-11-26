@@ -101,7 +101,7 @@ class _AgentProfileState extends State<AgentProfile> {
     try {
       final data = await client
           .from('appointments')
-          .select('date, buyer_id, meet_address')
+          .select('date, buyer_id, meet_address,client(username)')
           .eq('agent_id', agentid);
 
       if (data == null || data.isEmpty) {
@@ -268,7 +268,7 @@ class _AgentProfileState extends State<AgentProfile> {
                           shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(20.0)),
                           child: Text(
-                            'Date: ${appointment['date']} \nBuyer: ${appointment['buyer_id']} \nLocation: ${appointment['meet_address']}',
+                            'Date: ${appointment['date']} \nBuyer: ${appointment['username']} \nLocation: ${appointment['meet_address']}',
                             style: tAppointmentButton,
                           ),
                         ),
@@ -385,15 +385,40 @@ class _AgentProfileState extends State<AgentProfile> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => ViewOffers(),
+                            builder: (context) => HomePage(),
                           ),
                         );
                       },
                       icon: const Icon(
                         Icons.home,
                         size: 40,
-                        color: Colors.white,
+                        color: scaffoldColor,
                       ),
+                    ),
+                  ),
+                  ElevatedButton.icon(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => ViewOffers(
+                                  agentid: agentid,
+                                )),
+                      );
+                    },
+                    icon: const Icon(Icons.person),
+                    label: const Text(
+                      'Offers',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: buttonColor,
+                      iconColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 16.0, horizontal: 20.0),
                     ),
                   ),
                 ],

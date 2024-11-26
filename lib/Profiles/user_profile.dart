@@ -64,7 +64,7 @@ class _UserProfileState extends State<UserProfile> {
     try {
       final data = await client
           .from('appointments')
-          .select('date, agent_id, meet_address')
+          .select('date, agent_id, meet_address,agent(username)')
           .eq('buyer_id', clientSupabaseId);
 
       if (data == null || data.isEmpty) {
@@ -651,7 +651,7 @@ class _UserProfileState extends State<UserProfile> {
                           child: Padding(
                             padding: const EdgeInsets.all(8.0),
                             child: Text(
-                              'Date: ${appointment['date']}  \nLocation: ${appointment['meet_address']}',
+                              'Seller: ${appointment['username']}  \nDate: ${appointment['date']}  \nLocation: ${appointment['meet_address']}',
                               style: tDrawerButton,
                             ),
                           ),
