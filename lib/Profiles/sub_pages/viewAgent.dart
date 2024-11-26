@@ -39,14 +39,43 @@ class _ViewAgentState extends State<ViewAgent> {
 // Declare a global instance of Globalvariable
 
   Globalvariable hiredAgent = Globalvariable();
-
+double avgRating =0;
   @override
   void initState() {
     super.initState();
     getCurrentUserId();
     fetchAgentProperties();
+    getAvgRating();
     fetchAgentInfo(); // Fetch properties on initialization
   }
+
+Future<void> getAvgRating() async {
+  try {
+    // Perform the RPC call
+    final response = await client.rpc('get_average_agent_rating', 
+      params: {'id': widget.agentid},
+    );
+    print(response);
+
+    if (response != null) {
+      
+      setState(() {
+        avgRating = response as double? ?? 0.0;
+      });
+      print("Avg rating: $avgRating");
+    } else {
+      setState(() {
+        avgRating = 0.0;
+      });
+      print("No rating data found");
+    }
+  } catch (e) {
+    print("Unexpected error: $e");
+  }
+}
+
+
+
 
   String getteragentid() {
     return widget.agentid;
@@ -77,7 +106,6 @@ class _ViewAgentState extends State<ViewAgent> {
         setState(() {
           print(data);
           agentinfo = List<Map<String, dynamic>>.from(data);
-// Since agentinfo is a list, we need to access the first item using agentinfo[0] to retrieve the properties.
 
           // Access the first agent record
           // title = agentinfo[0]['title'] ?? 'No Title';
@@ -425,24 +453,24 @@ String? getCurrentUserIdAsString() {
                             Text('  Hiring Fees: $price', style: tUserBody),
                             if (widget.role != 'admin') ...[
                               const Text('  Agent Rating:', style: tUserBody),
-                              RatingBar(
-                                initialRating: 4.0,
+                             RatingBar.builder(
+                                initialRating: avgRating,
+                                minRating: 0,
                                 direction: Axis.horizontal,
-                                allowHalfRating: true,
                                 itemCount: 5,
                                 itemSize: 30,
+                                allowHalfRating: true,
                                 ignoreGestures: true,
-                                ratingWidget: RatingWidget(
-                                  full: const Icon(Icons.star,
-                                      color: Color.fromARGB(255, 243, 201, 75)),
-                                  half: const Icon(Icons.star_half,
-                                      color: Color.fromARGB(255, 243, 201, 75)),
-                                  empty: const Icon(Icons.star_border,
-                                      color: Colors.grey),
+                                itemPadding: const EdgeInsets.symmetric(horizontal: 4.0),
+                                onRatingUpdate: (newRating) {
+                                 
+                                },
+                                itemBuilder: (context, index) => Icon(
+                                  index < avgRating ? Icons.star : Icons.star_border,
+                                  color: Colors.amber,
                                 ),
-                                maxRating: 5,
-                                onRatingUpdate: (rating) {},
                               ),
+
                             ]
                           ],
                         ),
@@ -572,7 +600,7 @@ String? getCurrentUserIdAsString() {
                           Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (context) =>  ViewAgentReviews()
+                            builder: (context) =>  ViewAgentReviews( agentid: widget.agentid,)
                             // for refresh
                             ),
                       );
