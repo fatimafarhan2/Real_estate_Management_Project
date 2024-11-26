@@ -1,11 +1,25 @@
 import 'package:flutter/material.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+
+// Import your custom styles and colors
 import 'package:real_estate_app/UI/textstyle.dart';
 import '../UI/color.dart';
 
-double Price = 12345;
-
 class OfferForm extends StatefulWidget {
-  const OfferForm({super.key});
+  final double price;
+  final String interval_mon;
+  final String agentid;
+  final String buyerid;
+  final int property_id;
+
+  const OfferForm({
+    super.key,
+    required this.price,
+    required this.property_id,
+    required this.interval_mon,
+    required this.agentid,
+    required this.buyerid,
+  });
 
   @override
   State<OfferForm> createState() => _OfferFormState();
@@ -14,17 +28,16 @@ class OfferForm extends StatefulWidget {
 class _OfferFormState extends State<OfferForm> {
   String selectedOption = "Installments";
   double installmentPeriod = 1; // Default to 1 month
-  double offerAmount =
-      0.0; // Value for entered offer amount , this is by default
+  double offerAmount = 0.0; // Default offer amount
 
   final TextEditingController offerAmountController = TextEditingController();
 
   double get calculatedInstallmentPrice {
-    // Calculate based on selected option and offer amount
+    // Calculate installment price based on selected option and offer amount
     if (selectedOption == "Both" && offerAmount > 0) {
       return offerAmount / installmentPeriod;
     } else if (selectedOption == "Installments") {
-      return Price / installmentPeriod;
+      return widget.price / installmentPeriod;
     }
     return 0.0;
   }
@@ -33,6 +46,40 @@ class _OfferFormState extends State<OfferForm> {
   void dispose() {
     offerAmountController.dispose();
     super.dispose();
+  }
+
+  Future<void> submitOffer() async {
+    final supabase = Supabase.instance.client;
+
+    try {
+      await supabase.rpc('insert_offer_with_defaults', params: {
+        '_buyer_id': widget.buyerid,
+        '_agent_id': widget.agentid,
+        '_property_id': widget.property_id,
+        '_installment_amount': selectedOption != 'Full Price Bargain'
+            ? calculatedInstallmentPrice
+            : 0.0,
+        '_installment_time_period': selectedOption != 'Full Price Bargain'
+            ? installmentPeriod.round()
+            : 0,
+        '_total_price':
+            selectedOption == 'Full Price Bargain' || selectedOption == 'Both'
+                ? offerAmount
+                : 0.0,
+      });
+
+      // Show success message
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Offer submitted successfully!')),
+      );
+
+      // Optionally navigate back or reset the form
+    } catch (error) {
+      // Handle errors
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error submitting offer: $error')),
+      );
+    }
   }
 
   @override
@@ -52,7 +99,7 @@ class _OfferFormState extends State<OfferForm> {
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-             const Center(
+              const Center(
                 child: Text(
                   'Place new offer',
                   style: TextStyle(fontSize: 25, fontWeight: FontWeight.w800),
@@ -80,9 +127,8 @@ class _OfferFormState extends State<OfferForm> {
                 onChanged: (String? newValue) {
                   setState(() {
                     selectedOption = newValue!;
-                    //with every new option the offer amount becomes 0.0 and text field becomes clear
-                    offerAmount = 0.0; // Reset offer amount on option change
-                    offerAmountController.clear(); // Clear the text field
+                    offerAmount = 0.0; // Reset offer amount
+                    offerAmountController.clear(); // Clear text field
                   });
                 },
               ),
@@ -102,7 +148,7 @@ class _OfferFormState extends State<OfferForm> {
                 TextFormField(
                   controller: offerAmountController,
                   keyboardType: TextInputType.number,
-                  decoration: InputDecoration(
+                  decoration: const InputDecoration(
                     fillColor: boxcolor,
                     labelText: 'Offer Amount',
                     hintText: 'Enter amount',
@@ -119,7 +165,8 @@ class _OfferFormState extends State<OfferForm> {
                   height: 30,
                   child: Text(
                     'Installment Price: \$${calculatedInstallmentPrice.toStringAsFixed(2)}',
-                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                    style: const TextStyle(
+                        fontSize: 20, fontWeight: FontWeight.bold),
                   ),
                 ),
 
@@ -137,8 +184,15 @@ class _OfferFormState extends State<OfferForm> {
                     Slider(
                       value: installmentPeriod,
                       min: 1.0,
-                      max: 24.0,
-                      divisions: 23,
+                      max: (widget.interval_mon != "00:00:00" &&
+                              widget.interval_mon.isNotEmpty)
+                          ? double.tryParse(widget.interval_mon) ?? 24
+                          : 24, // Default to 24 months if interval_mon is invalid
+                      divisions: ((widget.interval_mon != "00:00:00" &&
+                                  widget.interval_mon.isNotEmpty)
+                              ? (int.tryParse(widget.interval_mon) ?? 24)
+                              : 24) -
+                          1,
                       onChanged: (newPeriod) {
                         setState(() {
                           installmentPeriod = newPeriod;
@@ -150,11 +204,12 @@ class _OfferFormState extends State<OfferForm> {
                   ],
                 ),
 
-              SizedBox(height: 25),
+              const SizedBox(height: 25),
               Center(
                 child: ElevatedButton(
                   onPressed: () {
-
+                    submitOffer();
+                    Navigator.pop(context);
                   },
                   style: ElevatedButton.styleFrom(
                     minimumSize: Size(200, 50),

@@ -59,6 +59,59 @@ class _UserProfileState extends State<UserProfile> {
     }
   }
 
+  List<Map<String, dynamic>> appointments = [];
+  Future<void> fetchAppointments() async {
+    try {
+      final data = await client
+          .from('appointments')
+          .select('date, agent_id, meet_address,agent(username)')
+          .eq('buyer_id', clientSupabaseId);
+
+      if (data == null || data.isEmpty) {
+        print('No appointments found for this agent.');
+      } else {
+        setState(() {
+          print(data);
+          appointments = List<Map<String, dynamic>>.from(data);
+        });
+      }
+    } catch (e) {
+      print('Error fetching appointments: $e');
+    }
+  }
+
+//----------------------------------------deletion transaction
+
+  final AuthServicesUser _auth = AuthServicesUser();
+
+  Future<void> deleteUser(String userId, String email) async {
+    // final curruser =client
+    final response = await Supabase.instance.client.rpc('delete_user', params: {
+      'user_id': userId,
+    });
+
+    if (response != null) {
+      print('Error deleting user: ${response.error!.message}');
+    } else {
+      _auth.deleteUserByEmail(email);
+      print('User deleted successfully');
+    }
+  }
+
+  Future<void> deletePropertyAndRelationship(int propertyId) async {
+    final response = await Supabase.instance.client
+        .rpc('delete_property_and_relationship', params: {
+      'p_property_id': propertyId,
+    });
+
+    if (response != null) {
+      print(
+          'Error deleting property and relationship: ${response.error!.message}');
+    } else {
+      print('Property and relationship deleted successfully');
+    }
+  }
+
 // logout
   void firebaselogout() {
     final auth = AuthServicesUser();
@@ -71,6 +124,7 @@ class _UserProfileState extends State<UserProfile> {
     auth.signOut();
   }
 
+  String clientSupabaseId = '';
   @override
   void initState() {
     super.initState();
@@ -79,6 +133,7 @@ class _UserProfileState extends State<UserProfile> {
     fetchUserProperties();
     fetchAgentInfo();
     getCurrentUserId();
+    getCurrentUser();
     // Listen to scroll events
     _scrollController.addListener(_scrollListener); // changes
     // Fetch properties on initialization
@@ -109,8 +164,27 @@ class _UserProfileState extends State<UserProfile> {
     }
   }
 
+  Future<void> getCurrentUser() async {
+    try {
+      // Get the current user from Supabase
+      final user = Supabase.instance.client.auth.currentUser;
+
+      if (user != null) {
+        clientSupabaseId = user.id;
+        print("Current User ID: ${user.id}");
+      } else {
+        print("No user is currently logged in.");
+      }
+    } catch (e) {
+      print("Error fetching current user: $e");
+      return null;
+    }
+  }
+
+  int prop_id = 0;
 //pop for deleting account
-  Future<void> _deleteAccount(BuildContext context, bool entity) async {
+  Future<void> _deleteAccount(
+      BuildContext context, bool entity, int prop_id) async {
     //bool entity true of to be deleted is a property else false if an acocount
     TextEditingController inputController = TextEditingController();
     TextEditingController ratingController = TextEditingController();
@@ -125,7 +199,12 @@ class _UserProfileState extends State<UserProfile> {
             onPressed: () {
               // Action for 'Yes' button
               //add query here
-
+              if (entity == false) {
+                deleteUser(widget.userid, email);
+              } else {
+                print(prop_id);
+                deletePropertyAndRelationship(prop_id);
+              }
               //if bool is yes add query for property else for
               //for deletion of account
               Navigator.of(context).pop(); // Close the dialog
@@ -197,6 +276,7 @@ class _UserProfileState extends State<UserProfile> {
   Future<void> fetchUserProperties() async {
     try {
       final data = await client.from('properties').select('''
+          property_id,
           title,
           price,
           status,
@@ -341,10 +421,8 @@ class _UserProfileState extends State<UserProfile> {
                                             'User Name: $username',
                                             style: tUserBody,
                                           ),
-                                          
                                         ],
                                       ),
-                                      
                                     ),
                                     Expanded(
                                       // Start Expanded (Right Column)
@@ -356,29 +434,31 @@ class _UserProfileState extends State<UserProfile> {
                                           Text('Phone Number: $phoneNumber',
                                               style: tUserBody),
                                           Text('Email: $email',
-                                              style: tUserBody),  
-                                  ElevatedButton.icon(
-                                    onPressed: (){
-                              Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) => const UserProfileUpdatePage()
-                                        // for refresh
-                                        ),
-                                  );
-                                    },
-                                    label:const Text( 'Update Profile',style: tbutton_style,),
-                                    icon: const Icon(Icons.update),
-                                    style: ElevatedButton.styleFrom(
-                                      iconColor: Colors.white,
-                                      backgroundColor: buttonColor,
-                                    ),
-
-                                  )                                      
+                                              style: tUserBody),
+                                          ElevatedButton.icon(
+                                            onPressed: () {
+                                              Navigator.push(
+                                                context,
+                                                MaterialPageRoute(
+                                                    builder: (context) =>
+                                                        const UserProfileUpdatePage()
+                                                    // for refresh
+                                                    ),
+                                              );
+                                            },
+                                            label: const Text(
+                                              'Update Profile',
+                                              style: tbutton_style,
+                                            ),
+                                            icon: const Icon(Icons.update),
+                                            style: ElevatedButton.styleFrom(
+                                              iconColor: Colors.white,
+                                              backgroundColor: buttonColor,
+                                            ),
+                                          )
                                         ],
                                       ), // End Right Column
                                     ),
-
                                   ],
                                 )
                               : SingleChildScrollView(
@@ -399,23 +479,25 @@ class _UserProfileState extends State<UserProfile> {
                                         Text('Phone Number: $phoneNumber',
                                             style: tUserBody),
                                         Text('Email: $email', style: tUserBody),
-                                              ElevatedButton.icon(
-                                    onPressed: (){
-                              Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) => const UserProfileUpdatePage()
-                                        // for refresh
-                                        ),
-                                  );
-                                    },
-                                    label:const Text( 'Update Profile',style: tbutton_style,),
-                                  
-                                    style: ElevatedButton.styleFrom(
-                                      backgroundColor: buttonColor,
-                                    ),
-
-                                  )
+                                        ElevatedButton.icon(
+                                          onPressed: () {
+                                            Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                  builder: (context) =>
+                                                      const UserProfileUpdatePage()
+                                                  // for refresh
+                                                  ),
+                                            );
+                                          },
+                                          label: const Text(
+                                            'Update Profile',
+                                            style: tbutton_style,
+                                          ),
+                                          style: ElevatedButton.styleFrom(
+                                            backgroundColor: buttonColor,
+                                          ),
+                                        )
                                       ],
                                     ),
                                   ),
@@ -475,7 +557,8 @@ class _UserProfileState extends State<UserProfile> {
                               width: 10,
                               height: 110, // Increased height to fit all info
                               child: ElevatedButton.icon(
-                                onPressed: () { }, //to go to that agent's View page
+                                onPressed:
+                                    () {}, //to go to that agent's View page
                                 label: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
@@ -552,22 +635,32 @@ class _UserProfileState extends State<UserProfile> {
                 borderRadius: BorderRadius.circular(20.0),
               ),
               child: SingleChildScrollView(
-                  child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    for (int i = 1; i <= 10; i++)
-                      Padding(
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: appointments.map((appointment) {
+                      return Padding(
                         padding: const EdgeInsets.all(8.0),
-                        child: Text(
-                          'Appointment number : $i ',
-                          style: tAppointmentBody,
+                        child: Card(
+                          color: buttonColor,
+                          margin: const EdgeInsets.all(2.0),
+                          elevation: 5.0,
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(20.0)),
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Text(
+                              'Seller: ${appointment['username']}  \nDate: ${appointment['date']}  \nLocation: ${appointment['meet_address']}',
+                              style: tDrawerButton,
+                            ),
+                          ),
                         ),
-                      )
-                  ],
+                      );
+                    }).toList(),
+                  ),
                 ),
-              )),
+              ),
             ),
             const SizedBox(
               height: 10,
@@ -675,7 +768,11 @@ class _UserProfileState extends State<UserProfile> {
                               ],
                             ),
                             IconButton(
-                              onPressed: () => _deleteAccount(context, true),
+                              onPressed: () {
+                                int prop_id = properties[index]['property_id'];
+                                print('property id :$prop_id');
+                                _deleteAccount(context, true, prop_id);
+                              },
                               icon: const Icon(Icons.delete),
                               color: Colors.white,
                             )
@@ -728,10 +825,10 @@ class _UserProfileState extends State<UserProfile> {
                     child: IconButton(
                       onPressed: () {
                         Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => const HomePage()),
-                      );
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => const HomePage()),
+                        );
                       }, //homepage
                       color: Colors.white, // Icon color
                       icon: const Icon(Icons.house_outlined),
@@ -774,7 +871,7 @@ class _UserProfileState extends State<UserProfile> {
               child: Row(
                 children: [
                   TextButton(
-                    onPressed: () => _deleteAccount(context, false),
+                    onPressed: () => _deleteAccount(context, false, 0),
                     child: const Text(
                       'DELETE ACCOUNT',
                       style: tappbar_style,

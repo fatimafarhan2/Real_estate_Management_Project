@@ -34,6 +34,9 @@ class _AgentProfileState extends State<AgentProfile> {
   String email = '';
   String useridfirebase = '';
   String agentid = '';
+  double avgRating=0.0;
+
+
 
   Future<void> getCurrentUser() async {
     try {
@@ -51,6 +54,34 @@ class _AgentProfileState extends State<AgentProfile> {
       return null;
     }
   }
+
+
+
+Future<void> getAvgRating() async {
+  try {
+    // Perform the RPC call
+    final response = await client.rpc('get_average_agent_rating', 
+      params: {'id': agentid},
+    );
+    print(response);
+
+    if (response != null) {
+      
+      setState(() {
+        avgRating = response as double? ?? 0.0;
+      });
+      print("Avg rating: $avgRating");
+    } else {
+      setState(() {
+        avgRating = 0.0;
+      });
+      print("No rating data found");
+    }
+  } catch (e) {
+    print("Unexpected error: $e");
+  }
+}
+
 
   Future<void> fetchAgentInfo() async {
     try {
@@ -102,7 +133,7 @@ class _AgentProfileState extends State<AgentProfile> {
     try {
       final data = await client
           .from('appointments')
-          .select('date, buyer_id, meetaddress')
+          .select('date, buyer_id, meet_address,client(username)')
           .eq('agent_id', agentid);
 
       if (data == null || data.isEmpty) {
@@ -137,6 +168,7 @@ class _AgentProfileState extends State<AgentProfile> {
     fetchAgentInfo();
     fetchAgentProperties();
     fetchAppointments(); // Fetch appointments data
+    getAvgRating();
   }
 
   @override
@@ -212,7 +244,7 @@ ElevatedButton.icon(
                             Text('  Price: $price', style: tUserBody),
                             const Text('  Agent Rating:', style: tUserBody),
                             RatingBar(
-                              initialRating: ratingFromDb,
+                              initialRating: avgRating,
                               direction: Axis.horizontal,
                               allowHalfRating: true,
                               itemCount: 5,
@@ -258,29 +290,45 @@ ElevatedButton.icon(
               ),
             ),
             Container(
+              padding: const EdgeInsets.all(6.0),
+              height: 200,
+              width: 390,
               decoration: BoxDecoration(
-                color: boxcolor,
-                border: Border.all(width: 5.0, style: BorderStyle.solid),
+                color: drawerBoxColorTwo,
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.2), // Shadow color
+                    blurRadius: 15, // Softness of the shadow
+                    spreadRadius: 0.8, // Extend the shadow
+                    offset: const Offset(10, 10), // Position of the shadow
+                  ),
+                ],
                 borderRadius: BorderRadius.circular(20.0),
               ),
-              height: 300,
-              width: 500,
               child: SingleChildScrollView(
-                  child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: appointments.map((appointment) {
-                    return Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Text(
-                        'Date: ${appointment['date']} \nBuyer: ${appointment['buyer_id']} \nLocation: ${appointment['meetaddress']}',
-                        style: tAppointmentBody,
-                      ),
-                    );
-                  }).toList(),
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: appointments.map((appointment) {
+                      return Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Card(
+                          color: buttonColor,
+                          margin: const EdgeInsets.all(2.0),
+                          elevation: 5.0,
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(20.0)),
+                          child: Text(
+                            'Date: ${appointment['date']} \nBuyer: ${appointment['username']} \nLocation: ${appointment['meet_address']}',
+                            style: tAppointmentButton,
+                          ),
+                        ),
+                      );
+                    }).toList(),
+                  ),
                 ),
-              )),
+              ),
             ),
             SizedBox(
               height: 10,
@@ -389,15 +437,40 @@ ElevatedButton.icon(
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => ViewOffers(),
+                            builder: (context) => HomePage(),
                           ),
                         );
                       },
                       icon: const Icon(
                         Icons.home,
                         size: 40,
-                        color: Colors.white,
+                        color: scaffoldColor,
                       ),
+                    ),
+                  ),
+                  ElevatedButton.icon(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => ViewOffers(
+                                  agentid: agentid,
+                                )),
+                      );
+                    },
+                    icon: const Icon(Icons.person),
+                    label: const Text(
+                      'Offers',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: buttonColor,
+                      iconColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 16.0, horizontal: 20.0),
                     ),
                   ),
                 ],

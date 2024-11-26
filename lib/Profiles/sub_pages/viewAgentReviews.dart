@@ -20,7 +20,11 @@ class _ViewAgentReviewsState extends State<ViewAgentReviews> {
   
   Future<List<Map<String, dynamic>>> fetchAllComments() async {
     try {
-      final response = await client.from('agent_review').select('*').eq('agent_id',widget.agentid);
+      final response = await client
+    .from('agent_review')
+    .select('*, client!inner(username)')
+    .eq('agent_id', widget.agentid);
+
       if (response.isEmpty) {
         print('No data returned from the database');
         return [];
@@ -65,8 +69,10 @@ class _ViewAgentReviewsState extends State<ViewAgentReviews> {
             ? const Center(child: Text('No comments on Property'))
             : ListView.builder(
               itemCount: comments.length,
+           
               itemBuilder: (context, index){
                 final comment = comments[index];
+                    final username = comment['client']?['username'] ?? 'Anonymous';
                 return Padding(
                   padding:  const EdgeInsets.all(6.0),
                   child: Slidable(
@@ -94,7 +100,7 @@ class _ViewAgentReviewsState extends State<ViewAgentReviews> {
                         subtitle: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [ Text(
-                              'By: ${comment['author'] ?? 'Anonymous'}',
+                           'By: $username',
                               style: tUserBody,
                             ),
                             Text(
