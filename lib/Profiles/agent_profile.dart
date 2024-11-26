@@ -36,7 +36,7 @@ class _AgentProfileState extends State<AgentProfile> {
   String agentid = '';
   final ScrollController _scrollController = ScrollController();
   bool _showBottomBar = false;
-  double avgRating=0.0;
+  double avgRating = 0.0;
 
   @override
   void dispose() {
@@ -58,12 +58,10 @@ class _AgentProfileState extends State<AgentProfile> {
     }
   }
 
-
-
   int prop_id = 0;
 //pop for deleting account
   Future<void> _deleteAccount(
-      BuildContext context, bool entity, int prop_id) async {
+      BuildContext context, String email, String agentid) async {
     //bool entity true of to be deleted is a property else false if an acocount
     TextEditingController inputController = TextEditingController();
     TextEditingController ratingController = TextEditingController();
@@ -78,7 +76,7 @@ class _AgentProfileState extends State<AgentProfile> {
             onPressed: () {
               // Action for 'Yes' button
               //add query here
-          
+              deleteAgent(agentid, email);
               //if bool is yes add query for property else for
               //for deletion of account
               Navigator.of(context).pop(); // Close the dialog
@@ -97,6 +95,20 @@ class _AgentProfileState extends State<AgentProfile> {
     );
   }
 
+  final AuthServicesUser _auth = AuthServicesUser();
+  Future<void> deleteAgent(String agent_id, String email) async {
+    final response =
+        await Supabase.instance.client.rpc('delete_agent', params: {
+      'user_id': agent_id,
+    });
+
+    if (response != null) {
+      print('Error deleting agent: ${response.error!.message}');
+    } else {
+      _auth.deleteAgentByEmail(email);
+      print('Agent deleted successfully');
+    }
+  }
 
   Future<void> getCurrentUser() async {
     try {
@@ -115,33 +127,30 @@ class _AgentProfileState extends State<AgentProfile> {
     }
   }
 
+  Future<void> getAvgRating() async {
+    try {
+      // Perform the RPC call
+      final response = await client.rpc(
+        'get_average_agent_rating',
+        params: {'id': agentid},
+      );
+      print(response);
 
-
-Future<void> getAvgRating() async {
-  try {
-    // Perform the RPC call
-    final response = await client.rpc('get_average_agent_rating', 
-      params: {'id': agentid},
-    );
-    print(response);
-
-    if (response != null) {
-      
-      setState(() {
-        avgRating = response as double? ?? 0.0;
-      });
-      print("Avg rating: $avgRating");
-    } else {
-      setState(() {
-        avgRating = 0.0;
-      });
-      print("No rating data found");
+      if (response != null) {
+        setState(() {
+          avgRating = response as double? ?? 0.0;
+        });
+        print("Avg rating: $avgRating");
+      } else {
+        setState(() {
+          avgRating = 0.0;
+        });
+        print("No rating data found");
+      }
+    } catch (e) {
+      print("Unexpected error: $e");
     }
-  } catch (e) {
-    print("Unexpected error: $e");
   }
-}
-
 
   Future<void> fetchAgentInfo() async {
     try {
@@ -229,10 +238,11 @@ Future<void> getAvgRating() async {
     fetchAgentProperties();
     fetchAppointments(); // Fetch appointments data
     getAvgRating();
-    
+
     _scrollController.addListener(_scrollListener); // changes
   }
- bool _isHovering = true;
+
+  bool _isHovering = true;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -251,23 +261,24 @@ Future<void> getAvgRating() async {
           style: tappbar_style,
         ),
         actions: [
-ElevatedButton.icon(
-                    onPressed: (){
+          ElevatedButton.icon(
+            onPressed: () {
               Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => const AgentProfileUpdatePage()
-                        // for refresh
-                        ),
-                  );
-    },
-                    label:const Text( 'Update Profile',style: tbutton_style,),
-                  
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: buttonColor,
+                context,
+                MaterialPageRoute(
+                    builder: (context) => const AgentProfileUpdatePage()
+                    // for refresh
                     ),
-
-                  )
+              );
+            },
+            label: const Text(
+              'Update Profile',
+              style: tbutton_style,
+            ),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: buttonColor,
+            ),
+          )
         ],
       ),
       body: SingleChildScrollView(
@@ -541,15 +552,14 @@ ElevatedButton.icon(
           ],
         ),
       ),
-    
-       bottomNavigationBar: _showBottomBar
+      bottomNavigationBar: _showBottomBar
           ? BottomAppBar(
               color: const Color.fromARGB(255, 63, 13, 9),
               height: 60,
               child: Row(
                 children: [
                   TextButton(
-                    onPressed: () => _deleteAccount(context, false, 0),
+                    onPressed: () => _deleteAccount(context, email, agentid),
                     child: const Text(
                       'DELETE ACCOUNT',
                       style: tappbar_style,
@@ -559,8 +569,6 @@ ElevatedButton.icon(
               ),
             )
           : null,
-    
-    
     );
   }
 }
