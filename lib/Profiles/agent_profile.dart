@@ -34,8 +34,68 @@ class _AgentProfileState extends State<AgentProfile> {
   String email = '';
   String useridfirebase = '';
   String agentid = '';
+  final ScrollController _scrollController = ScrollController();
+  bool _showBottomBar = false;
   double avgRating=0.0;
 
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  void _scrollListener() {
+    if (_scrollController.position.atEdge) {
+      final isBottom = _scrollController.position.pixels > 0;
+      setState(() {
+        _showBottomBar =
+            isBottom; // _showBottomBar is set to true if at the bottom edge
+      });
+    } else {
+      setState(() {
+        _showBottomBar = false; // Otherwise, it is set to false
+      });
+    }
+  }
+
+
+
+  int prop_id = 0;
+//pop for deleting account
+  Future<void> _deleteAccount(
+      BuildContext context, bool entity, int prop_id) async {
+    //bool entity true of to be deleted is a property else false if an acocount
+    TextEditingController inputController = TextEditingController();
+    TextEditingController ratingController = TextEditingController();
+
+    await showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Are you sure you wish to delete ?'),
+        content: const SizedBox(height: 10.0),
+        actions: [
+          TextButton(
+            onPressed: () {
+              // Action for 'Yes' button
+              //add query here
+          
+              //if bool is yes add query for property else for
+              //for deletion of account
+              Navigator.of(context).pop(); // Close the dialog
+            },
+            child: const Text('Yes'),
+          ),
+          TextButton(
+            onPressed: () {
+              // Action for 'No' button
+              Navigator.of(context).pop(); // Close the dialog
+            },
+            child: const Text('No'),
+          ),
+        ],
+      ),
+    );
+  }
 
 
   Future<void> getCurrentUser() async {
@@ -169,8 +229,10 @@ Future<void> getAvgRating() async {
     fetchAgentProperties();
     fetchAppointments(); // Fetch appointments data
     getAvgRating();
+    
+    _scrollController.addListener(_scrollListener); // changes
   }
-
+ bool _isHovering = true;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -392,7 +454,7 @@ ElevatedButton.icon(
                 ),
               ),
             ),
-            SizedBox(
+            const SizedBox(
               height: 53,
             ),
             SingleChildScrollView(
@@ -479,6 +541,26 @@ ElevatedButton.icon(
           ],
         ),
       ),
+    
+       bottomNavigationBar: _showBottomBar
+          ? BottomAppBar(
+              color: const Color.fromARGB(255, 63, 13, 9),
+              height: 60,
+              child: Row(
+                children: [
+                  TextButton(
+                    onPressed: () => _deleteAccount(context, false, 0),
+                    child: const Text(
+                      'DELETE ACCOUNT',
+                      style: tappbar_style,
+                    ),
+                  ),
+                ],
+              ),
+            )
+          : null,
+    
+    
     );
   }
 }
