@@ -696,7 +696,7 @@ String? getCurrentUserIdAsString() {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                              builder: (context) => Viewcomments()),
+                              builder: (context) => Viewcomments(property_id: widget.propertyid,)),
                         );
                       },
                       label: const Text('View Comments',

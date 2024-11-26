@@ -2,55 +2,57 @@ import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:real_estate_app/UI/color.dart';
 import 'package:real_estate_app/UI/textstyle.dart';
-
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 //implement if else bool vaibale to check when to select all agents or when to select agents associated with a specific user
 
-class Viewcomments extends StatelessWidget {
- Viewcomments({super.key});
- final List<Map<String, String>> comments = [
-    {
-      'author': 'John Doe',
-      'content': 'This is a great post! Really enjoyed it.',
-      'created_at': '2024-11-09'
-    },
-    {
-      'author': 'Jane Smith',
-      'content': 'Interesting perspective, thanks for sharing.',
-      'created_at': '2024-11-08'
-    },
-    {
-      'author': 'Alice Johnson',
-      'content': 'I found this very helpful, looking forward to more updates.',
-      'created_at': '2024-11-07'
-    },
-    {
-      'author': 'Bob Brown',
-      'content': 'I disagree with your point on...',
-      'created_at': '2024-11-06'
-    },
-    {
-      'author': 'John Doe',
-      'content': 'This is a great post! Really enjoyed it.',
-      'created_at': '2024-11-09'
-    },
-    {
-      'author': 'Jane Smith',
-      'content': 'Interesting perspective, thanks for sharing.',
-      'created_at': '2024-11-08'
-    },
-    {
-      'author': 'Alice Johnson',
-      'content': 'I found this very helpful, looking forward to more updates.',
-      'created_at': '2024-11-07'
-    },
-    {
-      'author': 'Bob Brown',
-      'content': 'I disagree with your point on...',
-      'created_at': '2024-11-06'
-    },
-  ];
+class Viewcomments extends StatefulWidget {
+ // ignore: non_constant_identifier_names
+ Viewcomments({super.key, required this.property_id});
+ final int property_id;
 
+  @override
+  State<Viewcomments> createState() => _ViewcommentsState();
+}
+
+class _ViewcommentsState extends State<Viewcomments> {
+  List<Map<String, dynamic>> comments = [];
+
+  final SupabaseClient client = Supabase.instance.client;
+
+  Future<List<Map<String, dynamic>>> fetchAllComments() async {
+    try {
+      final response = await client.from('property_review').select('*').eq('property_id',widget.property_id);
+      if (response.isEmpty) {
+        print('No data returned from the database');
+        return [];
+      }
+      print('Comments Data fetched successfully: $response');
+      return List<Map<String, dynamic>>.from(response);
+    } catch (e) {
+      print('Unexpected error: $e');
+      return [];
+    }
+  }
+
+
+
+
+   Future<void> fetchComments() async {
+    List<Map<String, dynamic>> fetchedComments = await fetchAllComments();
+    setState(() {
+      comments = fetchedComments;
+    });
+  }
+
+
+  
+  @override
+  void initState() {
+    super.initState();
+    fetchComments();
+    print(comments);
+  }
   @override
   Widget build(BuildContext context) {
     return  Scaffold(
@@ -62,7 +64,7 @@ class Viewcomments extends StatelessWidget {
         backgroundColor: propertyBGColor,
 
       body: comments.isEmpty
-            ? const Center(child: const Text('No comments on Property'))
+            ? const Center(child: Text('No comments on Property'))
             : ListView.builder(
               itemCount: comments.length,
               itemBuilder: (context, index){
@@ -88,7 +90,7 @@ class Viewcomments extends StatelessWidget {
                     child: Card(
                       elevation: 3,
                       child: ListTile(
-                        title: Text(comment['content']?? '',
+                        title: Text(comment['comments']?? '',
                         style: tUserBody,
                         ),
                         subtitle: Column(
@@ -98,7 +100,7 @@ class Viewcomments extends StatelessWidget {
                               style: tUserBody,
                             ),
                             Text(
-                              'Date: ${comment['created_at'] ?? ''}',
+                              'Date: ${comment['date'] ?? ''}',
                               style: tUserBody,
                             ),
                             ],

@@ -29,6 +29,7 @@ class _HomePageState extends State<HomePage> {
   double? selsize;
   String? selname;
   List<int> propertyId = [];
+  String propertyStatus='';
 
   List<Map<String, dynamic>> filteredProperties = [];
   List<Map<String, dynamic>> profiles = [];
@@ -69,7 +70,7 @@ class _HomePageState extends State<HomePage> {
 
   Future<List<Map<String, dynamic>>> fetchAllProperties() async {
     try {
-      final response = await client.from('properties').select('*');
+      final response = await client.from('properties').select('*').eq('prop_status','approved').eq('status', 'Not Sold');
       if (response.isEmpty) {
         print('No data returned from the database');
         return [];

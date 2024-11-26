@@ -2,7 +2,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:real_estate_app/Chat/pages/agentchtlogpage.dart';
-import 'package:real_estate_app/Homepage/mainpage.dart';
+import 'package:real_estate_app/Homepage/homepage.dart';
+import 'package:real_estate_app/Profiles/sub_pages/AgentProfileUPdated.dart';
 import 'package:real_estate_app/Profiles/sub_pages/viewOffers.dart';
 import 'package:real_estate_app/UI/color.dart';
 import 'package:real_estate_app/UI/textstyle.dart';
@@ -155,6 +156,25 @@ class _AgentProfileState extends State<AgentProfile> {
           '  Agent Profile',
           style: tappbar_style,
         ),
+        actions: [
+ElevatedButton.icon(
+                    onPressed: (){
+              Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => const AgentProfileUpdatePage()
+                        // for refresh
+                        ),
+                  );
+    },
+                    label:const Text( 'Update Profile',style: tbutton_style,),
+                  
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: buttonColor,
+                    ),
+
+                  )
+        ],
       ),
       body: SingleChildScrollView(
         child: Column(

@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:real_estate_app/Admin/display_screen/viewagent.dart';
 import 'package:real_estate_app/Chat/pages/agentlist.dart';
 import 'package:real_estate_app/Chat/pages/chatLogpage.dart';
-import 'package:real_estate_app/Homepage/mainpage.dart';
+import 'package:real_estate_app/Homepage/homepage.dart';
 import 'package:real_estate_app/Profiles/sub_pages/userProfileUpdatedPage.dart';
 import 'package:real_estate_app/Profiles/sub_pages/viewAgent.dart';
 import 'package:real_estate_app/Profiles/sub_pages/viewWishlists.dart';
@@ -125,6 +125,7 @@ class _UserProfileState extends State<UserProfile> {
             onPressed: () {
               // Action for 'Yes' button
               //add query here
+
               //if bool is yes add query for property else for
               //for deletion of account
               Navigator.of(context).pop(); // Close the dialog
@@ -345,7 +346,6 @@ class _UserProfileState extends State<UserProfile> {
                                       ),
                                       
                                     ),
-
                                     Expanded(
                                       // Start Expanded (Right Column)
                                       child: Column(

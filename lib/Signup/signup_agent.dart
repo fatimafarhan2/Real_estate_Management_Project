@@ -7,6 +7,9 @@ import 'package:real_estate_app/login_and_signup/authServices.dart';
 import 'dart:convert';
 import 'dart:typed_data';
 import 'package:crypto/crypto.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:image_picker/image_picker.dart';
+import 'dart:io';
 
 class SignupPageAgent extends StatefulWidget {
   @override
@@ -37,6 +40,74 @@ class _SignupPageAgentState extends State<SignupPageAgent> {
 
   //supabase auth service
   final authServices = Authservices();
+
+
+  final storage = Supabase.instance.client.storage;
+  
+  final SupabaseClient client = Supabase.instance.client;
+
+//extractin url of user's upload image
+  Future<String?> fetchImageUrl(String filePath) async {
+    try {
+      final publicUrl = client.storage
+          .from('ProfilePictures') // Bucket name
+          .getPublicUrl(filePath);
+      return publicUrl;
+    } catch (e) {
+      debugPrint('Error fetching public URL: $e');
+      return null;
+    }
+  }
+
+  File? _imageFile;
+//Pick image method
+  Future pickImage() async {
+    final ImagePicker picker = ImagePicker();
+
+    //Pick from gallery
+    XFile? image = await picker.pickImage(source: ImageSource.gallery);
+    setState(() {
+      if (image != null) {
+        _imageFile = File(image.path);
+      }
+    });
+  }
+
+//upload method
+// Upload method
+  Future<String?> uploadImage() async {
+    if (_imageFile == null) return null;
+
+    final fileName =
+        DateTime.now().millisecondsSinceEpoch.toString(); // Unique file name
+    final path = 'uploads/$fileName'; // Path in the bucket
+
+    try {
+      // Upload the file to Supabase storage
+      await Supabase.instance.client.storage
+          .from('ProfilePictures') // Bucket name
+          .upload(path, _imageFile!);
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Image uploaded successfully')),
+      );
+      // Returning the file path
+      final url = await storage.from('ProfilePicture').getPublicUrl(path);
+
+      setState(() {
+        fPath = url.toString();
+      });
+      return fPath;
+    } catch (e) {
+      debugPrint('Error uploading image: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Failed to upload image')),
+      );
+      return null;
+    }
+  }
+
+
+
 
   //hash function for password
   String hashPassword(String password) {
@@ -91,6 +162,28 @@ class _SignupPageAgentState extends State<SignupPageAgent> {
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 20),
+           Center(
+                  child: ElevatedButton.icon(
+                    onPressed: () async {
+                      await pickImage(); // Open image picker
+                      //extracting image url:modified
+                      await uploadImage(); // Upload the image to Supabase
+                      print(fPath);
+                    },
+                    icon: const Icon(Icons.upload),
+                    label: const Text(
+                      'Upload Image',
+                      style: tbutton_style,
+                    ),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: buttonColor,
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 20, vertical: 10),
+                    ),
+                  ),
+                ),
+
                 // First Name
                 const Text('First Name:', style: Tleading_header),
                 const SizedBox(height: 5),
