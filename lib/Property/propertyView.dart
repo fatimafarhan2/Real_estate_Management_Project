@@ -657,7 +657,7 @@ class _PropertyviewState extends State<Propertyview> {
 
               propertyHeading(
                 const Text(
-                  'Price Information',
+                  'Agent Information',
                   style: TextStyle(
                     fontSize: 33,
                     fontStyle: FontStyle.normal,

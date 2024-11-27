@@ -162,27 +162,27 @@ class _SignupPageUserState extends State<SignupPageUser> {
                 ),
                 const SizedBox(height: 20),
 
-                Center(
-                  child: ElevatedButton.icon(
-                    onPressed: () async {
-                      await pickImage(); // Open image picker
-                      //extracting image url:modified
-                      await uploadImage(); // Upload the image to Supabase
-                      print(fPath);
-                    },
-                    icon: const Icon(Icons.upload),
-                    label: const Text(
-                      'Upload Image',
-                      style: tbutton_style,
-                    ),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: buttonColor,
-                      foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 20, vertical: 10),
-                    ),
-                  ),
-                ),
+                // Center(
+                //   child: ElevatedButton.icon(
+                //     onPressed: () async {
+                //       await pickImage(); // Open image picker
+                //       //extracting image url:modified
+                //       await uploadImage(); // Upload the image to Supabase
+                //       print(fPath);
+                //     },
+                //     icon: const Icon(Icons.upload),
+                //     label: const Text(
+                //       'Upload Image',
+                //       style: tbutton_style,
+                //     ),
+                //     style: ElevatedButton.styleFrom(
+                //       backgroundColor: buttonColor,
+                //       foregroundColor: Colors.white,
+                //       padding: const EdgeInsets.symmetric(
+                //           horizontal: 20, vertical: 10),
+                //     ),
+                //   ),
+                // ),
 
                 // First Name
                 const Text('First Name:', style: Tleading_header),

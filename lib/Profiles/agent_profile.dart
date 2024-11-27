@@ -9,6 +9,7 @@ import 'package:real_estate_app/UI/color.dart';
 import 'package:real_estate_app/UI/textstyle.dart';
 import 'package:real_estate_app/login_and_signup/Firebase/Authserviceuser.dart';
 import 'package:real_estate_app/login_and_signup/authServices.dart';
+import 'package:real_estate_app/login_and_signup/login_signup.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 // Navigator done
@@ -44,19 +45,32 @@ class _AgentProfileState extends State<AgentProfile> {
     super.dispose();
   }
 
-  void _scrollListener() {
-    if (_scrollController.position.atEdge) {
-      final isBottom = _scrollController.position.pixels > 0;
+    Future<void> getCurrentUserId() async {
+    var user1 = FirebaseAuth.instance.currentUser; // Get the current user
+
+    if (user1 != null) {
       setState(() {
-        _showBottomBar =
-            isBottom; // _showBottomBar is set to true if at the bottom edge
+        useridfirebase = user1.uid;
       });
     } else {
       setState(() {
-        _showBottomBar = false; // Otherwise, it is set to false
+        useridfirebase = '';
       });
     }
   }
+
+void _scrollListener() {
+  if (_scrollController.position.maxScrollExtent == _scrollController.position.pixels) {
+    // User is at the bottom of the scrollable content
+    setState(() {
+      _showBottomBar = true;
+    });
+  } else {
+    setState(() {
+      _showBottomBar = false;
+    });
+  }
+}
 
   int prop_id = 0;
 //pop for deleting account
@@ -76,10 +90,19 @@ class _AgentProfileState extends State<AgentProfile> {
             onPressed: () {
               // Action for 'Yes' button
               //add query here
+              
               deleteAgent(agentid, email);
               //if bool is yes add query for property else for
               //for deletion of account
-              Navigator.of(context).pop(); // Close the dialog
+               Navigator.of(context).pop(); // Close the dialog
+                Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => const LoginSignUp()
+                    // for refresh
+                    ),
+              );
+             
             },
             child: const Text('Yes'),
           ),
@@ -108,6 +131,7 @@ class _AgentProfileState extends State<AgentProfile> {
       _auth.deleteAgentByEmail(email);
       print('Agent deleted successfully');
     }
+      
   }
 
   Future<void> getCurrentUser() async {
@@ -236,7 +260,8 @@ class _AgentProfileState extends State<AgentProfile> {
     getCurrentUser();
     fetchAgentInfo();
     fetchAgentProperties();
-    fetchAppointments(); // Fetch appointments data
+    fetchAppointments(); 
+     getCurrentUserId();// Fetch appointments data
     getAvgRating();
 
     _scrollController.addListener(_scrollListener); // changes
@@ -282,6 +307,7 @@ class _AgentProfileState extends State<AgentProfile> {
         ],
       ),
       body: SingleChildScrollView(
+          controller: _scrollController, // Attach the ScrollController
         child: Column(
           children: [
             Row(
@@ -380,21 +406,24 @@ class _AgentProfileState extends State<AgentProfile> {
               ),
               child: SingleChildScrollView(
                 child: Padding(
-                  padding: const EdgeInsets.all(8.0),
+                  padding: const EdgeInsets.all(6.0),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: appointments.map((appointment) {
                       return Padding(
-                        padding: const EdgeInsets.all(8.0),
+                        padding: const EdgeInsets.all(5.0),
                         child: Card(
                           color: buttonColor,
                           margin: const EdgeInsets.all(2.0),
                           elevation: 5.0,
                           shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(20.0)),
-                          child: Text(
-                            'Date: ${appointment['date']} \nBuyer: ${appointment['username']} \nLocation: ${appointment['meet_address']}',
-                            style: tAppointmentButton,
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Text(
+                              'Date: ${appointment['date']} \nBuyer: ${appointment['username']} \nLocation: ${appointment['meet_address']}',
+                              style: tAppointmentButton,
+                            ),
                           ),
                         ),
                       );
@@ -470,83 +499,89 @@ class _AgentProfileState extends State<AgentProfile> {
             ),
             SingleChildScrollView(
               scrollDirection: Axis.horizontal,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  ElevatedButton.icon(
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => AgentChatLogPage(
-                                  agentId: useridfirebase,
-                                )),
-                      );
-                    },
-                    icon: const Icon(Icons.person),
-                    label: const Text(
-                      'Chats',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: buttonColor,
-                      iconColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(
-                          vertical: 16.0, horizontal: 20.0),
-                    ),
-                  ),
-                  Container(
-                    height: 60,
-                    width: 60,
-                    decoration: const BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: buttonColor,
-                    ),
-                    child: IconButton(
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  
+                  children: [
+                    ElevatedButton.icon(
                       onPressed: () {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => HomePage(),
-                          ),
+                              builder: (context) => AgentChatLogPage(
+                                    agentId: useridfirebase,
+                                  )),
                         );
                       },
-                      icon: const Icon(
-                        Icons.home,
-                        size: 40,
-                        color: scaffoldColor,
+                      icon: const Icon(Icons.person),
+                      label: const Text(
+                        'Chats',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: buttonColor,
+                        iconColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(
+                            vertical: 16.0, horizontal: 20.0),
                       ),
                     ),
-                  ),
-                  ElevatedButton.icon(
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => ViewOffers(
-                                  agentid: agentid,
-                                )),
-                      );
-                    },
-                    icon: const Icon(Icons.person),
-                    label: const Text(
-                      'Offers',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.w700,
+                    const SizedBox(width: 50,),
+                    Container(
+                      height: 60,
+                      width: 60,
+                      decoration: const BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: buttonColor,
+                      ),
+                      child: IconButton(
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => HomePage(),
+                            ),
+                          );
+                        },
+                        icon: const Icon(
+                          Icons.home,
+                          size: 40,
+                          color: scaffoldColor,
+                        ),
                       ),
                     ),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: buttonColor,
-                      iconColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(
-                          vertical: 16.0, horizontal: 20.0),
+                    const SizedBox(width: 50,),
+                    ElevatedButton.icon(
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => ViewOffers(
+                                    agentid: agentid,
+                                  )),
+                        );
+                      },
+                      icon: const Icon(Icons.person),
+                      label: const Text(
+                        'Offers',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: buttonColor,
+                        iconColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(
+                            vertical: 16.0, horizontal: 20.0),
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           ],

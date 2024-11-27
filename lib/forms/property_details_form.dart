@@ -268,7 +268,7 @@ class _PropertyDetailsState extends State<PropertyDetails> {
                 buildTextField(
                     'Description', 'Enter Description', descriptionController),
                 buildTextField('Max Installment Time Period',
-                    'Enter timeperiod (Months)', installmentPeriodController),
+                    'format: number (Months)', installmentPeriodController),
 
                 const SizedBox(height: 10),
 
@@ -351,15 +351,10 @@ class _PropertyDetailsState extends State<PropertyDetails> {
                 ),
 
                 const SizedBox(height: 20),
-                ElevatedButton(
-                  onPressed: () {
-                    print('Hired Agent ID: ${hiredAgent.agent_id}');
-                  },
-                  child: Text('see hiredagent'),
-                ),
-                const SizedBox(height: 20),
 
                 ElevatedButton(
+                  style: ElevatedButton.styleFrom(backgroundColor: drawerBoxColor,
+                  ),
                   onPressed: () async {
                     if (selectedCategoryId == null ||
                         selectedCity == null ||
@@ -398,7 +393,7 @@ class _PropertyDetailsState extends State<PropertyDetails> {
                     );
                     Navigator.pop(context);
                   },
-                  child: Text('Submit'),
+                  child: Text('Submit',style: tbutton_style,),
                 ),
               ],
             ),

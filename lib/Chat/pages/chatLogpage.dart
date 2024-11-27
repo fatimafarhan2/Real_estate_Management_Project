@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:real_estate_app/Chat/pages/chatpage.dart';
+import 'package:real_estate_app/UI/color.dart';
 
 class UserChatLogPage extends StatelessWidget {
   final String userId;
@@ -73,6 +74,7 @@ class UserChatLogPage extends StatelessWidget {
                   final agentEmail = emailSnapshot.data!;
 
                   return Card(
+                    color: drawerBoxColor,
                     margin: const EdgeInsets.symmetric(
                         vertical: 10, horizontal: 15),
                     elevation: 5,

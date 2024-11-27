@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:real_estate_app/Chat/pages/chatpage.dart';
+import 'package:real_estate_app/UI/color.dart';
 
 class AgentChatLogPage extends StatelessWidget {
   final String agentId;
@@ -39,7 +40,8 @@ class AgentChatLogPage extends StatelessWidget {
           }
 
           final chats = snapshot.data!.docs;
-
+print('chat:$chats');
+print('agentid:$agentId');
           if (chats.isEmpty) {
             return const Center(child: Text("No chats found."));
           }
@@ -69,6 +71,7 @@ class AgentChatLogPage extends StatelessWidget {
 
                   final userEmail = emailSnapshot.data!;
                   return Card(
+                    color:drawerBoxColor,
                     margin: const EdgeInsets.symmetric(
                         vertical: 10, horizontal: 15),
                     elevation: 5,

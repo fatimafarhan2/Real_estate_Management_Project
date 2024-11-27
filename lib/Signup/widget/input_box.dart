@@ -6,6 +6,7 @@ class Inputbox extends StatelessWidget {
     required this.hintText,
     required this.controller,
     this.fillColor = const Color.fromARGB(255, 147, 153, 97),
+  
   });
 
   final String hintText;

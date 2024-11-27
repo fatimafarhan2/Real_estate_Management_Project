@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:real_estate_app/UI/color.dart';
+import 'package:real_estate_app/UI/textstyle.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:real_estate_app/Profiles/sub_pages/viewAgent.dart';
 
@@ -43,6 +45,7 @@ class AgentListPage extends StatelessWidget {
 
           final agents = snapshot.data!.docs;
           return ListView.builder(
+            
             itemCount: agents.length,
             itemBuilder: (context, index) {
               final agent = agents[index];
@@ -52,16 +55,19 @@ class AgentListPage extends StatelessWidget {
                 margin:
                     const EdgeInsets.symmetric(vertical: 10, horizontal: 15),
                 elevation: 5,
+                color: drawerBoxColor,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: ListTile(
+                  
                   contentPadding: const EdgeInsets.all(10),
                   title: Text(
                     agentEmail,
                     style: TextStyle(fontWeight: FontWeight.bold),
                   ),
                   trailing: ElevatedButton(
+                    style: ElevatedButton.styleFrom(backgroundColor: buttonColor),
                     onPressed: () async {
                       try {
                         // Fetch agent_id from Supabase based on email
@@ -92,7 +98,7 @@ class AgentListPage extends StatelessWidget {
                         );
                       }
                     },
-                    child: const Text("View Profile"),
+                    child: const Text("View Profile",style: tbutton_style,),
                   ),
                 ),
               );

@@ -12,6 +12,7 @@ import 'package:real_estate_app/UI/textstyle.dart';
 import 'package:real_estate_app/forms/property_details_form.dart';
 import 'package:real_estate_app/login_and_signup/Firebase/Authserviceuser.dart';
 import 'package:real_estate_app/login_and_signup/authServices.dart';
+import 'package:real_estate_app/login_and_signup/login_signup.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 //Navigators done
@@ -108,6 +109,10 @@ class _UserProfileState extends State<UserProfile> {
       print(
           'Error deleting property and relationship: ${response.error!.message}');
     } else {
+      //snackabr
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Property deleted successfully!')),
+      );
       print('Property and relationship deleted successfully');
     }
   }
@@ -199,12 +204,54 @@ class _UserProfileState extends State<UserProfile> {
             onPressed: () {
               // Action for 'Yes' button
               //add query here
-              if (entity == false) {
+              
                 deleteUser(widget.userid, email);
-              } else {
+                  Navigator.of(context).pop(); // Close the dialog
+                Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => const LoginSignUp()
+                    // for refresh
+                    ),
+              );
+              
+              // Close the dialog
+            },
+            child: const Text('Yes'),
+          ),
+          TextButton(
+            onPressed: () {
+              // Action for 'No' button
+              Navigator.of(context).pop(); // Close the dialog
+            },
+            child: const Text('No'),
+          ),
+        ],
+      ),
+    );
+  }
+
+
+
+Future<void> _deleteProperties(
+      BuildContext context, bool entity, int prop_id) async {
+    //bool entity true of to be deleted is a property else false if an acocount
+    TextEditingController inputController = TextEditingController();
+    TextEditingController ratingController = TextEditingController();
+
+    await showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Are you sure you wish to delete ?'),
+        content: const SizedBox(height: 10.0),
+        actions: [
+          TextButton(
+            onPressed: () {
+              // Action for 'Yes' button
+              //add query here
                 print(prop_id);
                 deletePropertyAndRelationship(prop_id);
-              }
+                fetchUserProperties();
               //if bool is yes add query for property else for
               //for deletion of account
               Navigator.of(context).pop(); // Close the dialog
@@ -222,6 +269,8 @@ class _UserProfileState extends State<UserProfile> {
       ),
     );
   }
+
+
 
 //fetching all agents hired by user
 
@@ -349,35 +398,13 @@ class _UserProfileState extends State<UserProfile> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: ClipOval(
-                        child: profilePic == 'No profile picture'
-                            ? Image.asset(
-                                'images/default_profile.jpg',
-                                width: 150,
-                                height: 200,
-                              )
-                            : Image.network(profilePic,
-                                width: 190.0,
-                                height: 200.0,
-                                fit: BoxFit.cover, loadingBuilder:
-                                    (context, child, loadingProgress) {
-                                if (loadingProgress == null) return child;
-                                return Center(
-                                  child: CircularProgressIndicator(
-                                    value: loadingProgress.expectedTotalBytes !=
-                                            null
-                                        ? loadingProgress
-                                                .cumulativeBytesLoaded /
-                                            (loadingProgress
-                                                    .expectedTotalBytes ??
-                                                1)
-                                        : null,
-                                  ),
-                                );
-                              })),
+                        Padding(
+                  padding: const EdgeInsets.all(10.0),
+                  child: ClipOval(
+                    child:
+                        Image.asset('images/pp1.jpg', height: 160, width: 160),
                   ),
+                ),
                   // User Information Section
                   Padding(
                     padding: const EdgeInsets.all(10.0),
@@ -675,7 +702,7 @@ class _UserProfileState extends State<UserProfile> {
                   padding: const EdgeInsets.all(10.0), // Add vertical padding
                   alignment: Alignment.topLeft, // Center the text
                   child: const Text(
-                    ' Properties',
+                    'Properties',
                     style: TextStyle(
                       fontSize: 33,
                       fontStyle: FontStyle.normal,
@@ -701,6 +728,7 @@ class _UserProfileState extends State<UserProfile> {
                             // for refresh
                             ),
                       );
+                      
                     },
                     icon: Icon(Icons.add),
                     color: scaffoldColor,
@@ -771,7 +799,7 @@ class _UserProfileState extends State<UserProfile> {
                               onPressed: () {
                                 int prop_id = properties[index]['property_id'];
                                 print('property id :$prop_id');
-                                _deleteAccount(context, true, prop_id);
+                                _deleteProperties(context, true, prop_id);
                               },
                               icon: const Icon(Icons.delete),
                               color: Colors.white,
