@@ -29,7 +29,7 @@ class _HomePageState extends State<HomePage> {
   double? selsize;
   String? selname;
   List<int> propertyId = [];
-  String propertyStatus='';
+  String propertyStatus = '';
 
   List<Map<String, dynamic>> filteredProperties = [];
   List<Map<String, dynamic>> profiles = [];
@@ -70,7 +70,11 @@ class _HomePageState extends State<HomePage> {
 
   Future<List<Map<String, dynamic>>> fetchAllProperties() async {
     try {
-      final response = await client.from('properties').select('*').eq('prop_status','approved').eq('status', 'Not Sold');
+      final response = await client
+          .from('properties')
+          .select('*')
+          .eq('prop_status', 'approved')
+          .eq('status', 'Not Sold');
       if (response.isEmpty) {
         print('No data returned from the database');
         return [];
@@ -151,12 +155,11 @@ class _HomePageState extends State<HomePage> {
           filteredProperties = [];
         });
       }
-      //save all property ids in a list 
+      //save all property ids in a list
       // Extracting the 'property_id' column into an int list
-    propertyId = filteredProperties
-    .map((property) => property['property_id'] as int)
-    .toList();
-
+      propertyId = filteredProperties
+          .map((property) => property['property_id'] as int)
+          .toList();
     } catch (e) {
       print('Error filtering properties: $e');
     }
@@ -168,24 +171,26 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-          actions: [
-              ElevatedButton.icon(
-                  onPressed: () {
-                    Navigator.pop(context);
-                  },
-                  style: ElevatedButton.styleFrom(
-                        iconColor: const Color.fromARGB(255, 203, 208, 189),
-                        backgroundColor: const Color.fromARGB(255, 2, 41, 19),                  
-                  ),
-                  label: const Text('Profile',style: tbutton_style,),
-                  )
+        actions: [
+          ElevatedButton.icon(
+            onPressed: () {
+              Navigator.pop(context);
+            },
+            style: ElevatedButton.styleFrom(
+              iconColor: const Color.fromARGB(255, 203, 208, 189),
+              backgroundColor: const Color.fromARGB(255, 2, 41, 19),
+            ),
+            label: const Text(
+              'Profile',
+              style: tbutton_style,
+            ),
+          )
         ],
         title: const Center(
             child: Text(
           'Real Estate Management',
           style: tappbar_style,
         )),
-      
       ),
       backgroundColor: scaffoldColor,
       drawer: Drawer(
@@ -384,12 +389,15 @@ class _HomePageState extends State<HomePage> {
                                 )),
                           ),
                           ListTile(
-                            onTap: (){
-                                 Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => Propertyview(propertyid: property['property_id'],role: 'user',)),
-                        );
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => Propertyview(
+                                          propertyid: property['property_id'],
+                                          role: 'user',
+                                        )),
+                              );
                             }, //navigator for property view page
                             title: Text(
                               property['title'],

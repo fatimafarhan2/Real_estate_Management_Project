@@ -57,11 +57,11 @@ class Appointment {
 
               // Call your appointment storage function here
               saveAppointment(
-                date: date,
-                address: address,
-                clientId: clientId,
-                agentId: agentId,
-              );
+                  date: date,
+                  address: address,
+                  clientId: clientId,
+                  agentId: agentId,
+                  context: context);
 
               Navigator.of(context).pop();
             },
@@ -73,14 +73,15 @@ class Appointment {
     );
   }
 
-  Future<void> saveAppointment({
-    required String date,
-    required String address,
-    required String clientId,
-    required String agentId,
-  }) async {
+  Future<void> saveAppointment(
+      {required String date,
+      required String address,
+      required String clientId,
+      required String agentId,
+      required BuildContext context}) async {
     try {
       // Insert the appointment into the "appointments" table
+      print('date:$date');
       final response = await Supabase.instance.client
           .from('appointments') // Replace with your table name
           .insert({
@@ -89,6 +90,14 @@ class Appointment {
         'buyer_id': clientId, // Replace with your actual column name
         'agent_id': agentId, // Replace with your actual column name
       });
+
+      if (response != null) {
+        ScaffoldMessenger.of(context)
+            .showSnackBar(const SnackBar(content: Text("Appointment fail")));
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text("Appointment saved successfuly")));
+      }
     } catch (e) {
       print('Error saving appointment: $e');
     }

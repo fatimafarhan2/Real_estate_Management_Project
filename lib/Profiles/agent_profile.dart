@@ -45,12 +45,13 @@ class _AgentProfileState extends State<AgentProfile> {
     super.dispose();
   }
 
-    Future<void> getCurrentUserId() async {
+  Future<void> getCurrentUserId() async {
     var user1 = FirebaseAuth.instance.currentUser; // Get the current user
 
     if (user1 != null) {
       setState(() {
         useridfirebase = user1.uid;
+        print('agentidfirebase:$useridfirebase');
       });
     } else {
       setState(() {
@@ -59,18 +60,19 @@ class _AgentProfileState extends State<AgentProfile> {
     }
   }
 
-void _scrollListener() {
-  if (_scrollController.position.maxScrollExtent == _scrollController.position.pixels) {
-    // User is at the bottom of the scrollable content
-    setState(() {
-      _showBottomBar = true;
-    });
-  } else {
-    setState(() {
-      _showBottomBar = false;
-    });
+  void _scrollListener() {
+    if (_scrollController.position.maxScrollExtent ==
+        _scrollController.position.pixels) {
+      // User is at the bottom of the scrollable content
+      setState(() {
+        _showBottomBar = true;
+      });
+    } else {
+      setState(() {
+        _showBottomBar = false;
+      });
+    }
   }
-}
 
   int prop_id = 0;
 //pop for deleting account
@@ -90,19 +92,17 @@ void _scrollListener() {
             onPressed: () {
               // Action for 'Yes' button
               //add query here
-              
+
               deleteAgent(agentid, email);
               //if bool is yes add query for property else for
               //for deletion of account
-               Navigator.of(context).pop(); // Close the dialog
-                Navigator.push(
+              Navigator.of(context).pop(); // Close the dialog
+              Navigator.push(
                 context,
-                MaterialPageRoute(
-                    builder: (context) => const LoginSignUp()
+                MaterialPageRoute(builder: (context) => const LoginSignUp()
                     // for refresh
                     ),
               );
-             
             },
             child: const Text('Yes'),
           ),
@@ -131,7 +131,6 @@ void _scrollListener() {
       _auth.deleteAgentByEmail(email);
       print('Agent deleted successfully');
     }
-      
   }
 
   Future<void> getCurrentUser() async {
@@ -260,8 +259,8 @@ void _scrollListener() {
     getCurrentUser();
     fetchAgentInfo();
     fetchAgentProperties();
-    fetchAppointments(); 
-     getCurrentUserId();// Fetch appointments data
+    fetchAppointments();
+    getCurrentUserId(); // Fetch appointments data
     getAvgRating();
 
     _scrollController.addListener(_scrollListener); // changes
@@ -307,7 +306,7 @@ void _scrollListener() {
         ],
       ),
       body: SingleChildScrollView(
-          controller: _scrollController, // Attach the ScrollController
+        controller: _scrollController, // Attach the ScrollController
         child: Column(
           children: [
             Row(
@@ -503,7 +502,6 @@ void _scrollListener() {
                 padding: const EdgeInsets.all(8.0),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  
                   children: [
                     ElevatedButton.icon(
                       onPressed: () {
@@ -530,7 +528,9 @@ void _scrollListener() {
                             vertical: 16.0, horizontal: 20.0),
                       ),
                     ),
-                    const SizedBox(width: 50,),
+                    const SizedBox(
+                      width: 50,
+                    ),
                     Container(
                       height: 60,
                       width: 60,
@@ -554,7 +554,9 @@ void _scrollListener() {
                         ),
                       ),
                     ),
-                    const SizedBox(width: 50,),
+                    const SizedBox(
+                      width: 50,
+                    ),
                     ElevatedButton.icon(
                       onPressed: () {
                         Navigator.push(
