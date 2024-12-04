@@ -9,6 +9,7 @@ class AgentChatLogPage extends StatelessWidget {
   AgentChatLogPage({required this.agentId});
 
   Future<String> getUserEmail(String userId) async {
+    print(userId);
     try {
       final doc = await FirebaseFirestore.instance
           .collection('users')
@@ -40,8 +41,8 @@ class AgentChatLogPage extends StatelessWidget {
           }
 
           final chats = snapshot.data!.docs;
-print('chat:$chats');
-print('agentid:$agentId');
+          print('chat:$chats');
+          print('agentid:$agentId');
           if (chats.isEmpty) {
             return const Center(child: Text("No chats found."));
           }
@@ -71,7 +72,7 @@ print('agentid:$agentId');
 
                   final userEmail = emailSnapshot.data!;
                   return Card(
-                    color:drawerBoxColor,
+                    color: drawerBoxColor,
                     margin: const EdgeInsets.symmetric(
                         vertical: 10, horizontal: 15),
                     elevation: 5,

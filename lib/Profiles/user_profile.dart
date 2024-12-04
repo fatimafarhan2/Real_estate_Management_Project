@@ -63,6 +63,8 @@ class _UserProfileState extends State<UserProfile> {
   List<Map<String, dynamic>> appointments = [];
   Future<void> fetchAppointments() async {
     try {
+      print('client id:$clientSupabaseId');
+
       final data = await client
           .from('appointments')
           .select('date, agent_id, meet_address,agent(username)')
@@ -140,6 +142,7 @@ class _UserProfileState extends State<UserProfile> {
     getCurrentUserId();
     getCurrentUser();
     // Listen to scroll events
+    fetchAppointments();
     _scrollController.addListener(_scrollListener); // changes
     // Fetch properties on initialization
   }
@@ -204,17 +207,16 @@ class _UserProfileState extends State<UserProfile> {
             onPressed: () {
               // Action for 'Yes' button
               //add query here
-              
-                deleteUser(widget.userid, email);
-                  Navigator.of(context).pop(); // Close the dialog
-                Navigator.push(
+
+              deleteUser(widget.userid, email);
+              Navigator.of(context).pop(); // Close the dialog
+              Navigator.push(
                 context,
-                MaterialPageRoute(
-                    builder: (context) => const LoginSignUp()
+                MaterialPageRoute(builder: (context) => const LoginSignUp()
                     // for refresh
                     ),
               );
-              
+
               // Close the dialog
             },
             child: const Text('Yes'),
@@ -231,9 +233,7 @@ class _UserProfileState extends State<UserProfile> {
     );
   }
 
-
-
-Future<void> _deleteProperties(
+  Future<void> _deleteProperties(
       BuildContext context, bool entity, int prop_id) async {
     //bool entity true of to be deleted is a property else false if an acocount
     TextEditingController inputController = TextEditingController();
@@ -249,9 +249,9 @@ Future<void> _deleteProperties(
             onPressed: () {
               // Action for 'Yes' button
               //add query here
-                print(prop_id);
-                deletePropertyAndRelationship(prop_id);
-                fetchUserProperties();
+              print(prop_id);
+              deletePropertyAndRelationship(prop_id);
+              fetchUserProperties();
               //if bool is yes add query for property else for
               //for deletion of account
               Navigator.of(context).pop(); // Close the dialog
@@ -269,8 +269,6 @@ Future<void> _deleteProperties(
       ),
     );
   }
-
-
 
 //fetching all agents hired by user
 
@@ -398,13 +396,13 @@ Future<void> _deleteProperties(
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
-                        Padding(
-                  padding: const EdgeInsets.all(10.0),
-                  child: ClipOval(
-                    child:
-                        Image.asset('images/pp1.jpg', height: 160, width: 160),
+                  Padding(
+                    padding: const EdgeInsets.all(10.0),
+                    child: ClipOval(
+                      child: Image.asset('images/pp1.jpg',
+                          height: 160, width: 160),
+                    ),
                   ),
-                ),
                   // User Information Section
                   Padding(
                     padding: const EdgeInsets.all(10.0),
@@ -678,7 +676,7 @@ Future<void> _deleteProperties(
                           child: Padding(
                             padding: const EdgeInsets.all(8.0),
                             child: Text(
-                              'Seller: ${appointment['username']}  \nDate: ${appointment['date']}  \nLocation: ${appointment['meet_address']}',
+                              'Seller: ${appointment['agent']?['username']}  \nDate: ${appointment['date']}  \nLocation: ${appointment['meet_address']}',
                               style: tDrawerButton,
                             ),
                           ),
@@ -728,7 +726,6 @@ Future<void> _deleteProperties(
                             // for refresh
                             ),
                       );
-                      
                     },
                     icon: Icon(Icons.add),
                     color: scaffoldColor,

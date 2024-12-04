@@ -55,15 +55,14 @@ class Appointment {
                 return;
               }
 
-              // Call your appointment storage function here
+              Navigator.of(context).pop(); // Close the dialog first
               saveAppointment(
-                  date: date,
-                  address: address,
-                  clientId: clientId,
-                  agentId: agentId,
-                  context: context);
-
-              Navigator.of(context).pop();
+                date: date,
+                address: address,
+                clientId: clientId,
+                agentId: agentId,
+                scaffoldContext: context, // Use the correct context here
+              );
             },
             icon: const Icon(Icons.save),
             label: const Text('Save'),
@@ -73,33 +72,35 @@ class Appointment {
     );
   }
 
-  Future<void> saveAppointment(
-      {required String date,
-      required String address,
-      required String clientId,
-      required String agentId,
-      required BuildContext context}) async {
+  Future<void> saveAppointment({
+    required String date,
+    required String address,
+    required String clientId,
+    required String agentId,
+    required BuildContext scaffoldContext, // Use a valid context here
+  }) async {
     try {
-      // Insert the appointment into the "appointments" table
-      print('date:$date');
-      final response = await Supabase.instance.client
-          .from('appointments') // Replace with your table name
-          .insert({
+      final response =
+          await Supabase.instance.client.from('appointments').insert({
         'date': date,
         'meet_address': address,
-        'buyer_id': clientId, // Replace with your actual column name
-        'agent_id': agentId, // Replace with your actual column name
+        'buyer_id': clientId,
+        'agent_id': agentId,
       });
 
-      if (response != null) {
-        ScaffoldMessenger.of(context)
-            .showSnackBar(const SnackBar(content: Text("Appointment fail")));
+      if (response.error != null) {
+        ScaffoldMessenger.of(scaffoldContext).showSnackBar(
+          const SnackBar(content: Text("Failed to save the appointment.")),
+        );
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text("Appointment saved successfuly")));
+        ScaffoldMessenger.of(scaffoldContext).showSnackBar(
+          const SnackBar(content: Text("Appointment saved successfully.")),
+        );
       }
     } catch (e) {
-      print('Error saving appointment: $e');
+      ScaffoldMessenger.of(scaffoldContext).showSnackBar(
+        SnackBar(content: Text("Error saving appointment: $e")),
+      );
     }
   }
 }

@@ -75,6 +75,8 @@ class _HomePageState extends State<HomePage> {
           .select('*')
           .eq('prop_status', 'approved')
           .eq('status', 'Not Sold');
+
+      print(response);
       if (response.isEmpty) {
         print('No data returned from the database');
         return [];
