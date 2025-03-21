@@ -1,16 +1,65 @@
-# real_estate_app
+# Real Estate Management System
 
-A new Flutter project.
+## Introduction
+The **Real Estate Management System** is a comprehensive platform designed to facilitate seamless property transactions and enhance communication between clients, agents, and administrators. The system is equipped with features to manage property listings, appointments, offers, and user interactions efficiently.
 
-## Getting Started
+## Key Features
+### User Management
+- **Admin**: Manages users, agents, and property listings while maintaining platform security.
+- **Agents**: Manage property listings, interact with clients, and respond to offers.
+- **Clients**: Browse properties, hire agents, schedule appointments, and make offers.
 
-This project is a starting point for a Flutter application.
+### Property Management
+- Users can list various property types such as:
+  - Apartments
+  - Condos
+  - Houses
+  - Land
+- Admins approve listings to ensure quality and authenticity.
 
-A few resources to get you started if this is your first Flutter project:
+### Appointment Scheduling
+- Clients can request appointments with agents for property viewings.
+- Agents can manage and respond to these requests directly.
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+### Offer Management
+- Clients submit offers to agents.
+- Agents can review, accept, or reject offers through the platform.
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+### Reviews & Ratings
+- Clients can leave reviews for agents to help improve service quality.
+- Property reviews help other clients make informed decisions.
+
+### Wishlist Feature
+- Clients can save properties to their wishlist for future reference.
+
+### Reporting System
+- Users can report inappropriate content, which admins review and act upon.
+
+## Database Structure
+### Key Tables
+- **User Table**: Stores details about clients, agents, and admins.
+- **Properties Table**: Tracks property details including size, location, and pricing.
+- **Appointments Table**: Manages scheduling data for property viewings.
+- **Offers Table**: Records offers submitted by clients for properties.
+- **Review Tables**: Track reviews for agents and properties.
+
+## Real-World Application
+This platform is suitable for:
+- Individuals looking to buy or sell real estate properties.
+- Real estate agents seeking an organized platform to manage clients and transactions.
+
+## Challenges Faced
+- Designing the many-to-many relationship between clients and agents.
+- Ensuring database efficiency while minimizing redundancy.
+
+## Future Improvements
+- Integration of AI-based property recommendations.
+- Enhanced analytics dashboard for improved insights.
+- Streamlined UI/UX for better user engagement.
+
+---
+## Contributors
+**Fatima Farhan** & **Najaah Noor** (BCS-5D)
+
+
+
